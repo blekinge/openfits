@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.27';
+$VERSION = '1.38';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -151,6 +151,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         these tags, units may be added in brackets immediately following the value
         (ie. C<55(mi/h)>).  If no units are specified, the default units are
         written.
+
+        See L<http://owl.phy.queensu.ca/~phil/exiftool/MIE1.1-20070121.pdf> for the
+        official MIE specification.
     },
    '0Type' => {
         Name => 'SubfileType',
@@ -298,7 +301,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     EMail       => { Groups => { 2 => 'Author' } },
     Keywords    => { List => 1 },
     ModifyDate  => { Groups => { 2 => 'Time' }, %dateInfo },
-    OriginalDate=> { Name => 'DateTimeOriginal', Groups => { 2 => 'Time' }, %dateInfo },
+    OriginalDate=> {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        %dateInfo,
+    },
     Phone       => { Name => 'PhoneNumber', Groups => { 2 => 'Author' } },
     References  => { List => 1 },
     Software    => { },
@@ -559,7 +567,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     ExposureTime    => {
         Writable => 'rational64u',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     Flash => {
         SubDirectory => {
@@ -821,24 +829,19 @@ sub MIEGroupFormat(;$)
 # ReadValue() with added support for UTF formats (utf8, utf16 and utf32)
 # Inputs: 0) data reference, 1) value offset, 2) format string,
 #         3) number of values (or undef to use all data)
-#         4) valid data length relative to offset
+#         4) valid data length relative to offset, 5) returned rational ref
 # Returns: converted value, or undefined if data isn't there
 #          or list of values in list context
 # Notes: all string formats are converted to UTF8
-sub ReadMIEValue($$$$$)
+sub ReadMIEValue($$$$$;$)
 {
-    my ($dataPt, $offset, $format, $count, $size) = @_;
+    my ($dataPt, $offset, $format, $count, $size, $ratPt) = @_;
     my $val;
     if ($format =~ /^(utf(8|16|32)|string)/) {
         if ($1 eq 'utf8' or $1 eq 'string') {
             # read the 8-bit string
             $val = substr($$dataPt, $offset, $size);
             # (as of ExifTool 7.62, leave string values unconverted)
-            ## convert ISO 8859-1 string to UTF-8 if necessary
-            #if ($1 eq 'string' and $val =~ /[\x80-\xff]/) {
-            #    $val = Image::ExifTool::Latin2Unicode($val,'n');
-            #    $val = Image::ExifTool::Unicode2UTF8($val,'n');
-            #}
         } else {
             # convert to UTF8
             my $fmt;
@@ -859,7 +862,7 @@ sub ReadMIEValue($$$$$)
         $val =~ s/\0.*//s unless $format =~ /_list$/;
     } else {
         $format = 'undef' if $format eq 'free'; # read 'free' as 'undef'
-        return ReadValue($dataPt, $offset, $format, $count, $size);
+        return ReadValue($dataPt, $offset, $format, $count, $size, $ratPt);
     }
     return $val;
 }
@@ -887,12 +890,11 @@ sub CheckMIE($$$)
     } elsif ($format !~ /^(utf|string|undef)/ and $$valPtr =~ /\)$/) {
         return 'Units not supported';
     } else {
-        if ($format eq 'string' and $exifTool->{OPTIONS}->{Charset} eq 'Latin' and
+        if ($format eq 'string' and $exifTool->{OPTIONS}->{Charset} ne 'UTF8' and
             $$valPtr =~ /[\x80-\xff]/)
         {
-            # convert from Latin to UTF-8
-            my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
-            $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+            # convert from Charset to UTF-8
+            $$valPtr = $exifTool->Encode($$valPtr,'UTF8');
         }
         $err = Image::ExifTool::CheckValue($valPtr, $format, $$tagInfo{Count});
     }
@@ -1080,7 +1082,7 @@ sub WriteMIEGroup($$$)
                     $subdirInfo{DirName} = $newInfo->{SubDirectory}->{DirName} || $newTag;
                     $subdirInfo{Parent} = $dirName;
                     # don't compress elements of an already compressed group
-                    $subdirInfo{IsCompressed} = 1;
+                    $subdirInfo{IsCompressed} = $$dirInfo{IsCompressed} || $compress;
                     $msg = WriteMIEGroup($exifTool, \%subdirInfo, $subTablePtr);
                     last MieElement if $msg;
                     # message is defined but empty if nothing was written
@@ -1091,6 +1093,10 @@ sub WriteMIEGroup($$$)
                         # group was written already
                         $toWrite = '';
                         next;
+                    } elsif (length($newVal) <= 4) {    # terminator only?
+                        $verbose and print $out "Deleted compressed $grp1 (empty)\n";
+                        next MieElement if $newTag eq $tag; # deleting the directory
+                        next;       # not creating the new directory
                     }
                     $writable = 'undef';
                     $newFormat = MIEGroupFormat();
@@ -1104,10 +1110,16 @@ sub WriteMIEGroup($$$)
                             DataPt  => \$oldVal,
                             DataLen => $valLen,
                             DirName => $$newInfo{Name},
-                            DataPos => $raf->Tell() - $valLen,
+                            DataPos => $$dirInfo{IsCompressed} ? undef : $raf->Tell() - $valLen,
                             DirStart=> 0,
                             DirLen  => $valLen,
                         );
+                        # write Compact subdirectories if we will compress the data
+                        if (($compress or $optCompress or $$dirInfo{IsCompressed}) and
+                            eval 'require Compress::Zlib')
+                        {
+                            $subdirInfo{Compact} = 1;
+                        }
                     }
                     $subdirInfo{Parent} = $dirName;
                     my $writeProc = $newInfo->{SubDirectory}->{WriteProc};
@@ -1144,7 +1156,7 @@ sub WriteMIEGroup($$$)
                     if ($isList) {
                         $isOverwriting = -1;    # force processing list elements individually
                     } else {
-                        $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
+                        $isOverwriting = $exifTool->IsOverwriting($nvHash);
                         last unless $isOverwriting;
                     }
                     my ($val, $cmpVal);
@@ -1181,12 +1193,12 @@ sub WriteMIEGroup($$$)
                                 }
                                 # keep any list items that we aren't overwriting
                                 foreach $v (@vals) {
-                                    next if Image::ExifTool::IsOverwriting($nvHash, $v);
+                                    next if $exifTool->IsOverwriting($nvHash, $v);
                                     push @newVals, $v;
                                 }
                             } else {
                                 # test to see if we really want to overwrite the value
-                                $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
+                                $isOverwriting = $exifTool->IsOverwriting($nvHash, $val);
                             }
                         }
                     }
@@ -1224,7 +1236,7 @@ sub WriteMIEGroup($$$)
                         ($newTag eq $lastTag and ($$newInfo{List} or $deletedTag eq $lastTag));
                 }
                 # get the new value to write (undef to delete)
-                push @newVals, Image::ExifTool::GetNewValues($nvHash);
+                push @newVals, $exifTool->GetNewValues($nvHash);
                 next unless @newVals;
                 $writable = $$newInfo{Writable} || $$tagTablePtr{WRITABLE};
                 if ($writable eq 'string') {
@@ -1236,10 +1248,8 @@ sub WriteMIEGroup($$$)
                     if ($isUTF8 > 0) {
                         $writable = 'utf8';
                         # write UTF-16 or UTF-32 if it is more compact
-                        my $pk = (GetByteOrder() eq 'MM') ? 'n' : 'v';
-                        $pk = uc($pk) if $isUTF8 > 1;
-                        # translate to utf16 or utf32
-                        my $tmp = Image::ExifTool::UTF82Unicode($newVal,$pk);
+                        my $to = $isUTF8 > 1 ? 'UCS4' : 'UCS2';
+                        my $tmp = Image::ExifTool::Decode(undef,$newVal,'UTF8',undef,$to);
                         if (length $tmp < length $newVal) {
                             $newVal = $tmp;
                             $writable = ($isUTF8 > 1) ? 'utf32' : 'utf16';
@@ -1512,7 +1522,7 @@ sub ProcessMIEGroup($$$)
                 Writable => 0,
                 PrintConv => 'length($val) > 60 ? substr($val,0,55) . "[...]" : $val',
             };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
             last;
         }
 
@@ -1559,7 +1569,7 @@ sub ProcessMIEGroup($$$)
                 WasCompressed => $wasCompressed,
             );
             # read from uncompressed data instead if necessary
-            $subdirInfo{RAF} = new File::RandomAccess(\$value) if $format & 0x04;
+            $subdirInfo{RAF} = new File::RandomAccess(\$value) if $valLen;
 
             my $oldOrder = GetByteOrder();
             SetByteOrder($format & 0x08 ? 'II' : 'MM');
@@ -1570,8 +1580,9 @@ sub ProcessMIEGroup($$$)
         } else {
             # process MIE data format types
             if ($tagInfo) {
+                my $rational;
                 # extract tag value
-                my $val = ReadMIEValue(\$value, 0, $formatStr, undef, $valLen);
+                my $val = ReadMIEValue(\$value, 0, $formatStr, undef, $valLen, \$rational);
                 unless (defined $val) {
                     $exifTool->Warn("Error reading $tag value");
                     $val = '<err>';
@@ -1606,7 +1617,7 @@ sub ProcessMIEGroup($$$)
                     );
                     # set DataPos and Base for uncompressed information only
                     unless ($wasCompressed) {
-                        $subdirInfo{DataPos} = $raf->Tell() - $valLen;
+                        $subdirInfo{DataPos} = 0; # (relative to Base)
                         $subdirInfo{Base}    = $raf->Tell() - $valLen;
                     }
                     # reset PROCESSED lookup for each MIE directory
@@ -1620,8 +1631,8 @@ sub ProcessMIEGroup($$$)
                     $exifTool->{NO_LIST} = 1;
                 } else {
                     # convert to specified character set if necessary
-                    if ($notUTF8 and $formatStr =~ /^(utf|string)/ and $val =~ /[\x80-\xff]/) {
-                        $val = $exifTool->UTF82Charset($val);
+                    if ($notUTF8 and $formatStr =~ /^(utf|string)/) {
+                        $val = $exifTool->Decode($val, 'UTF8');
                     }
                     if ($formatStr =~ /_list$/) {
                         # split list value into separate strings
@@ -1633,7 +1644,8 @@ sub ProcessMIEGroup($$$)
                         # add units to value if specified
                         $val .= "($units)" if defined $units;
                     }
-                    $exifTool->FoundTag($tagInfo, $val);
+                    my $key = $exifTool->FoundTag($tagInfo, $val);
+                    $$exifTool{RATIONAL}{$key} = $rational if defined $rational and defined $key;
                 }
             } else {
                 # skip over unknown information or free bytes
@@ -1712,7 +1724,7 @@ sub ProcessMIE($$)
         my $num = $raf->Read($buff, 8);
         if ($num == 8) {
             # verify file identifier
-            if ($buff =~ /^~(\x10|\x18)\x04(.)0MIE/) {
+            if ($buff =~ /^~(\x10|\x18)\x04(.)0MIE/s) {
                 SetByteOrder($1 eq "\x10" ? 'MM' : 'II');
                 my $len = ord($2);
                 # skip extended DataLength if it exists
@@ -1751,7 +1763,7 @@ sub ProcessMIE($$)
         # this is a new MIE document -- increment document count
         unless ($numDocs) {
             # this is a valid MIE file (unless a trailer on another file)
-            $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+            $exifTool->SetFileType();
             $exifTool->{NO_LIST} = 1;   # handle lists ourself
             $exifTool->{MIE_COUNT} = { };
             undef $hasZlib;
@@ -2092,7 +2104,7 @@ ARM systems), regardless of the endian-ness of the stored values.
 Rational values are treated as two separate integers.  The numerator always
 comes first regardless of the byte ordering.  In a signed rational value,
 only the numerator is signed.  The denominator of all rational values is
-unsigned (ie. a signed 32-bit rational of 0x80000000/0x80000000 evaluates to
+unsigned (ie. a signed 64-bit rational of 0x80000000/0x80000000 evaluates to
 -1, not +1).
 
 =item 8.
@@ -2507,6 +2519,8 @@ tag name.  For example:
 
 =head1 REVISIONS
 
+  2010-04-05 - Fixed “Format Size” Note 7 to give the correct number of bits
+               in the example rational value
   2007-01-21 - Specified LF character (0x0a) for text newline sequence
   2007-01-19 - Specified ISO 8859-1 character set for extended ASCII codes
   2007-01-01 - Improved wording of Step 5 for scanning backwards in MIE file
@@ -2521,7 +2535,7 @@ tag name.  For example:
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

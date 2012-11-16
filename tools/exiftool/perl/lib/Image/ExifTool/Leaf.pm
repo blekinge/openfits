@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 sub ProcessLeaf($$$);
 
@@ -21,11 +21,11 @@ sub ProcessLeaf($$$);
     PROCESS_PROC => \&ProcessLeaf,
     GROUPS => { 0 => 'Leaf', 2 => 'Camera' },
     NOTES => q{
-These tags are found in .MOS images from Leaf digital camera backs as
-written by Creo Leaf Capture.  They exist within the Leaf-specific directory
-structure of EXIF tag 0x8606. The tables below list observed Leaf tags,
-however ExifTool will extract any tags found in the Leaf directories even if
-they don't appear in these tables.
+        These tags are found in .MOS images from Leaf digital camera backs as
+        written by Creo Leaf Capture.  They exist within the Leaf-specific directory
+        structure of EXIF tag 0x8606.  The tables below list observed Leaf tags,
+        however ExifTool will extract any tags found in the Leaf directories even if
+        they don't appear in these tables.
     },
     icc_camera_profile => {
         Name => 'ICC_Profile',
@@ -73,7 +73,7 @@ they don't appear in these tables.
     back_serial_number => {
         Name => 'BackSerial',
         Description => 'Back Serial Number',
-        PrintConv => '$val =~ s/ .*//; $val',
+        PrintConv => '$val =~ s/ .*//s; $val',
     },
     image_offset => { Format => 'int16u' },
 );
@@ -110,7 +110,7 @@ they don't appear in these tables.
     CaptProf_serial_number  => {
         Name => 'CaptureSerial',
         Description => 'Capture Serial Number',
-        PrintConv => '$val =~ s/ .*//; $val',
+        PrintConv => '$val =~ s/ .*//s; $val',
     },
     CaptProf_image_offset       => {},
     CaptProf_luminance_consts   => {},
@@ -335,13 +335,13 @@ they don't appear in these tables.
 
 # table for Leaf SubIFD entries
 %Image::ExifTool::Leaf::SubIFD = (
-    GROUPS => { 0 => 'EXIF', 1 => 'LeafSubIFD', 2 => 'Image'},
+    GROUPS => { 0 => 'MakerNotes', 1 => 'LeafSubIFD', 2 => 'Image'},
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     NOTES => q{
-Leaf also writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags
-in this sub-IFD are currently known, except for tag 0x8606 which really
-shouldn't be here anyway (so it doesn't appear in the table below) because
-it duplicates a reference to the same data of tag 0x8606 in IFD0.
+        Leaf writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags in
+        this sub-IFD are currently known, except for tag 0x8606 which really
+        shouldn't be here anyway (so it doesn't appear in the table below) because
+        it duplicates a reference to the same data of tag 0x8606 in IFD0.
     },
 );
 
@@ -417,7 +417,7 @@ sub ProcessLeaf($$$)
             last;
         }
         my $tag = substr($header, 8, 40);
-        $tag =~ s/\0.*//;
+        $tag =~ s/\0.*//s;
         next unless $tag;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         # generate tag info for unknown tags
@@ -447,7 +447,7 @@ sub ProcessLeaf($$$)
                 # make tags in main table unknown because they tend to be binary
                 $$tagInfo{Unknown} = 1 if $tagTablePtr eq \%Image::ExifTool::Leaf::Main;
             }
-            $tagInfo and Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            $tagInfo and AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         if ($verbose) {
             $exifTool->VerboseInfo($tag, $tagInfo,
@@ -502,7 +502,7 @@ Capture.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

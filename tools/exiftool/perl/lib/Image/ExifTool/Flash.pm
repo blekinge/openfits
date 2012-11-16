@@ -13,6 +13,8 @@
 #               4) http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/flv_8h.html
 #               5) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart3.pdf (Oct 2008)
 #               6) http://www.adobe.com/devnet/swf/pdf/swf_file_format_spec_v9.pdf
+#               7) http://help.adobe.com/en_US/FlashMediaServer/3.5_Deving/WS5b3ccc516d4fbf351e63e3d11a0773d56e-7ff6.html
+#               8) http://www.adobe.com/devnet/flv/pdf/video_file_format_spec_v10.pdf
 #
 # Notes:        I'll add AMF3 support if someone sends me a FLV with AMF3 data
 #------------------------------------------------------------------------------
@@ -24,7 +26,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::FLAC;
 
-$VERSION = '1.05';
+$VERSION = '1.09';
 
 sub ProcessMeta($$$;$);
 
@@ -34,6 +36,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
 # information extracted from SWF header
 %Image::ExifTool::Flash::Main = (
     GROUPS => { 2 => 'Video' },
+    VARS => { ALPHA_FIRST => 1 },
     NOTES => q{
         The information below is extracted from SWF (Shockwave Flash) files.  Tags
         with string ID's represent information extracted from the file header.
@@ -96,8 +99,16 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
             1 => 'ADPCM',
             2 => 'MP3',
             3 => 'PCM-LE (uncompressed)', #4
+            4 => 'Nellymoser 16kHz Mono', #8
             5 => 'Nellymoser 8kHz Mono',
             6 => 'Nellymoser',
+            7 => 'G.711 A-law logarithmic PCM', #8
+            8 => 'G.711 mu-law logarithmic PCM', #8
+            # (9 is reserved, ref 8)
+            10 => 'AAC', #8
+            11 => 'Speex', #8
+            13 => 'MP3 8-Khz', #8
+            15 => 'Device-specific sound', #8
         },
     },
     'Bit4-5' => {
@@ -110,7 +121,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         },
     },
     'Bit6' => {
-        Name => 'AudioSampleBits',
+        Name => 'AudioBitsPerSample',
         ValueConv => '8 * ($val + 1)',
     },
     'Bit7' => {
@@ -131,11 +142,13 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
     'Bit4-7' => {
         Name => 'VideoEncoding',
         PrintConv => {
+            1 => 'JPEG', #8
             2 => 'Sorensen H.263',
             3 => 'Screen Video',
             4 => 'On2 VP6',
             5 => 'On2 VP6 Alpha', #3
             6 => 'Screen Video 2', #3
+            7 => 'H.264', #7 (called "AVC" by ref 8)
         },
     },
 );
@@ -153,12 +166,14 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         Name => 'AudioBitrate',
         Groups => { 2 => 'Audio' },
         ValueConv => '$val * 1000',
-        PrintConv => 'int($val + 0.5)',
+        PrintConv => 'ConvertBitrate($val)',
     },
     'audiodelay'    => { Name => 'AudioDelay',      Groups => { 2 => 'Audio' } },
     'audiosamplerate'=>{ Name => 'AudioSampleRate', Groups => { 2 => 'Audio' } },
     'audiosamplesize'=>{ Name => 'AudioSampleSize', Groups => { 2 => 'Audio' } },
     'audiosize'     => { Name => 'AudioSize',       Groups => { 2 => 'Audio' } },
+    'bytelength'    => 'ByteLength', # (youtube)
+    'canseekontime' => 'CanSeekOnTime', # (youtube)
     'canSeekToEnd'  => 'CanSeekToEnd',
     'creationdate'  => {
         # (not an AMF date type in my sample)
@@ -166,6 +181,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         Groups => { 2 => 'Time' },
         ValueConv => '$val=~s/\s+$//; $val',    # trim trailing whitespace
     },
+    'createdby'     => 'CreatedBy', #7
     'cuePoints'     => {
         Name => 'CuePoint',
         SubDirectory => { TagTable => 'Image::ExifTool::Flash::CuePoint' },
@@ -186,6 +202,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
     'hasMetadata'   => 'HasMetadata',
     'hasVideo'      => 'HasVideo',
     'height'        => 'ImageHeight',
+    'httphostheader'=> 'HTTPHostHeader', # (youtube)
     'keyframesTimes'=> 'KeyFramesTimes',
     'keyframesFilepositions' => 'KeyFramePositions',
     'lasttimestamp' => 'LastTimeStamp',
@@ -196,12 +213,29 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
+    'purl'          => 'URL', # (youtube) (what does P mean?)
+    'pmsg'          => 'Message', # (youtube) (what does P mean?)
+    'sourcedata'    => 'SourceData', # (youtube)
+    'starttime'     => { # (youtube)
+        Name => 'StartTime',
+        PrintConv => 'ConvertDuration($val)',
+    },
     'stereo'        => { Name => 'Stereo',          Groups => { 2 => 'Audio' } },
+    'totalduration' => { # (youtube)
+        Name => 'TotalDuration',
+        PrintConv => 'ConvertDuration($val)',
+    },
+    'totaldatarate' => { # (youtube)
+        Name => 'TotalDataRate',
+        ValueConv => '$val * 1000',
+        PrintConv => 'int($val + 0.5)',
+    },
+    'totalduration' => 'TotalDuration',
     'videocodecid'  => 'VideoCodecID',
     'videodatarate' => {
         Name => 'VideoBitrate',
         ValueConv => '$val * 1000',
-        PrintConv => 'int($val + 0.5)',
+        PrintConv => 'ConvertBitrate($val)',
     },
     'videosize'     => 'VideoSize',
     'width'         => 'ImageWidth',
@@ -360,7 +394,7 @@ Record: for ($rec=0; ; ++$rec) {
                 next if ref($v) eq 'ARRAY' and not @$v; # ignore empty arrays
                 last if $t == 0x09; # (end of object)
                 if (not $$subTablePtr{$tag} and $tag =~ /^\w+$/) {
-                    Image::ExifTool::AddTagToTable($subTablePtr, $tag, { Name => ucfirst($tag) });
+                    AddTagToTable($subTablePtr, $tag, { Name => ucfirst($tag) });
                     $exifTool->VPrint(1, "  | (adding $tag)\n");
                 }
                 $exifTool->HandleTag($subTablePtr, $tag, $v,
@@ -509,7 +543,7 @@ sub FoundFlashTag($$$)
 # Read data from possibly compressed file
 # Inputs: 0) RAF reference, 1) data buffer, 2) bytes to read, 2) compressed flag
 # Returns: number of bytes read (may be greater than requested bytes if compressed)
-# - concatinates data to current buffer
+# - concatenates data to current buffer
 # - updates compressed flag with reference to inflate object for future calls
 #   (or sets to error message and returns zero on error)
 sub ReadCompressed($$$$)
@@ -564,7 +598,7 @@ sub ProcessSWF($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($buff, $inflate, $hasMeta);
+    my ($buff, $hasMeta);
 
     $raf->Read($buff, 8) == 8 or return 0;
     $buff =~ /^(F|C)WS([^\0])/ or return 0;
@@ -687,7 +721,7 @@ will add AMF3 support.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -704,7 +738,11 @@ under the same terms as Perl itself.
 
 =item L<http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/flv_8h.html>
 
+=item L<http://help.adobe.com/en_US/FlashMediaServer/3.5_Deving/WS5b3ccc516d4fbf351e63e3d11a0773d56e-7ff6.html>
+
 =item L<http://www.adobe.com/devnet/swf/pdf/swf_file_format_spec_v9.pdf>
+
+=item L<http://www.adobe.com/devnet/flv/pdf/video_file_format_spec_v10.pdf>
 
 =back
 

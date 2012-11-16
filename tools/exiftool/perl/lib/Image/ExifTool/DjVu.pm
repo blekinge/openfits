@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ParseAnt($);
 sub ProcessAnt($$$);
@@ -135,7 +135,7 @@ sub ProcessBZZ($$$);
         any tags that exist even if they don't appear here.  The DjVu v3
         documentation endorses tags borrowed from two standards: 1) BibTeX
         bibliography system tags (all lowercase Tag ID's in the table below), and 2)
-        PDF DocInfo tags (uppercase Tag ID's).
+        PDF DocInfo tags (capitalized Tag ID's).
     },
     # BibTeX tags (ref http://en.wikipedia.org/wiki/BibTeX)
     address     => { Groups => { 2 => 'Location' } },
@@ -174,13 +174,13 @@ sub ProcessBZZ($$$);
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
         # RFC 3339 date/time format
-        ValueConv => 'use Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
+        ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ModDate => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
-        ValueConv => 'use Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
+        ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Trapped => {
@@ -248,7 +248,6 @@ sub ProcessAnt($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $unknown = $exifTool->Options('Unknown');
 
     # quick pre-scan to check for metadata or XMP
     return 1 unless $$dataPt =~ /\(\s*(metadata|xmp)[\s("]/s;
@@ -295,7 +294,7 @@ sub ProcessMeta($$$)
             my $name = $$item[0];
             $name =~ tr/-_a-zA-Z0-9//dc; # remove illegal characters
             length $name or $err = 1, next;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $$item[0], { Name => ucfirst($name) });
+            AddTagToTable($tagTablePtr, $$item[0], { Name => ucfirst($name) });
         }
         $exifTool->HandleTag($tagTablePtr, $$item[0], $$item[1]);
     }
@@ -349,7 +348,7 @@ Image::ExifTool::AIFF.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

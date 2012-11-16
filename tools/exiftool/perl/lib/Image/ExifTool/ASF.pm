@@ -17,11 +17,11 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.10';
+$VERSION = '1.19';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
-sub ProcessPreview($$$);
+sub ProcessPicture($$$);
 sub ProcessCodecList($$$);
 
 # GUID definitions
@@ -163,14 +163,14 @@ my %advancedContentEncryption = (
     BannerImageData => {},
     BannerImageType => {},
     BannerImageURL => {},
-    Bitrate => {},
+    Bitrate => { PrintConv => 'ConvertBitrate($val)' },
     Broadcast => {},
     BufferAverage => {},
     Can_Skip_Backward => {},
     Can_Skip_Forward => {},
     Copyright => { Groups => { 2 => 'Author' } },
     CopyrightURL => { Groups => { 2 => 'Author' } },
-    CurrentBitrate => {},
+    CurrentBitrate => { PrintConv => 'ConvertBitrate($val)' },
     Description => {},
     DRM_ContentID => {},
     DRM_DRMHeader_ContentDistributor => {},
@@ -206,7 +206,7 @@ my %advancedContentEncryption = (
     NSC_Name => {},
     NSC_Phone => {},
     NumberOfFrames => {},
-    OptimalBitrate => {},
+    OptimalBitrate => { PrintConv => 'ConvertBitrate($val)' },
     PeakValue => {},
     Rating => {},
     Seekable => {},
@@ -273,11 +273,11 @@ my %advancedContentEncryption = (
     ParentalRating => {},
     ParentalRatingReason => {},
     PartOfSet => {},
-    PeakBitrate => {},
+    PeakBitrate => { PrintConv => 'ConvertBitrate($val)' },
     Period => {},
     Picture => {
         SubDirectory => {
-            TagTable => 'Image::ExifTool::ASF::Preview',
+            TagTable => 'Image::ExifTool::ASF::Picture',
         },
     },
     PlaylistDelay => {},
@@ -318,40 +318,40 @@ my %advancedContentEncryption = (
     Year => { Groups => { 2 => 'Time' } },
 );
 
-%Image::ExifTool::ASF::Preview = (
-    PROCESS_PROC => \&ProcessPreview,
-    GROUPS => { 2 => 'Video' },
+%Image::ExifTool::ASF::Picture = (
+    PROCESS_PROC => \&ProcessPicture,
+    GROUPS => { 2 => 'Image' },
     0 => {
-        Name => 'PreviewType',
-        PrintConv => {
-            0 => 'Other picture type',
-            1 => '32x32 PNG file icon',
-            2 => 'Other file icon',
-            3 => 'Front album cover',
-            4 => 'Back album cover',
-            5 => 'Leaflet page',
-            6 => 'Media label',
-            7 => 'Lead artist, performer, or soloist',
-            8 => 'Artists or performers',
+        Name => 'PictureType',
+        PrintConv => { # (Note: Duplicated in ID3, ASF and FLAC modules!)
+            0 => 'Other',
+            1 => '32x32 PNG Icon',
+            2 => 'Other Icon',
+            3 => 'Front Cover',
+            4 => 'Back Cover',
+            5 => 'Leaflet',
+            6 => 'Media',
+            7 => 'Lead Artist',
+            8 => 'Artist',
             9 => 'Conductor',
-            10 => 'Band or orchestra',
+            10 => 'Band',
             11 => 'Composer',
-            12 => 'Lyricist or writer',
-            13 => 'Recording studio or location',
-            14 => 'Recording session',
+            12 => 'Lyricist',
+            13 => 'Recording Studio or Location',
+            14 => 'Recording Session',
             15 => 'Performance',
-            16 => 'Capture from movie or video',
-            17 => 'A bright colored fish',
+            16 => 'Capture from Movie or Video',
+            17 => 'Bright(ly) Colored Fish',
             18 => 'Illustration',
-            19 => 'Band or artist logo',
-            20 => 'Publisher or studio logo',
+            19 => 'Band Logo',
+            20 => 'Publisher Logo',
         },
     },
-    1 => 'PreviewMimeType',
-    2 => 'PreviewDescription',
+    1 => 'PictureMimeType',
+    2 => 'PictureDescription',
     3 => {
-        Name => 'PreviewImage',
-        RawConv => '$self->ValidateImage(\$val,$tag)',
+        Name => 'Picture',
+        Binary => 1,
     },
 );
 
@@ -363,7 +363,7 @@ my %advancedContentEncryption = (
         Format => 'binary[16]',
         ValueConv => 'Image::ExifTool::ASF::GetGUID($val)',
     },
-    16 => { Name => 'FileSize',     Format => 'int64u' },
+    16 => { Name => 'FileLength',   Format => 'int64u' },
     24 => {
         Name => 'CreationDate',
         Format => 'int64u',
@@ -372,7 +372,8 @@ my %advancedContentEncryption = (
         ValueConv => q{ # (89 leap years between 1601 and 1970)
             my $t = $val / 1e7 - (((1970-1601)*365+89)*24*3600);
             return Image::ExifTool::ConvertUnixTime($t) . 'Z';
-        }
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     32 => { Name => 'DataPackets',  Format => 'int64u' },
     40 => {
@@ -391,7 +392,7 @@ my %advancedContentEncryption = (
     64 => { Name => 'Flags',        Format => 'int32u' },
     68 => { Name => 'MinPacketSize',Format => 'int32u' },
     72 => { Name => 'MaxPacketSize',Format => 'int32u' },
-    76 => { Name => 'MaxBitrate',   Format => 'int32u' },
+    76 => { Name => 'MaxBitrate',   Format => 'int32u', PrintConv => 'ConvertBitrate($val)' },
 );
 
 %Image::ExifTool::ASF::StreamProperties = (
@@ -516,7 +517,6 @@ sub GetGUID($)
 sub ProcessContentDescription($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 10;
@@ -527,7 +527,7 @@ sub ProcessContentDescription($$$)
         my $len = shift @len;
         next unless $len;
         return 0 if $pos + $len > $dirLen;
-        my $val = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$len),'II');
+        my $val = $exifTool->Decode(substr($$dataPt,$pos,$len),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, $tag, $val);
         $pos += $len;
     }
@@ -541,7 +541,6 @@ sub ProcessContentDescription($$$)
 sub ProcessContentBranding($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 40;
@@ -573,7 +572,7 @@ sub ReadASF($$$$$)
     my ($exifTool, $dataPt, $pos, $format, $size) = @_;
     my @vals;
     if ($format == 0) { # unicode string
-        $vals[0] = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$size),'II');
+        $vals[0] = $exifTool->Decode(substr($$dataPt,$pos,$size),'UCS2','II');
     } elsif ($format == 2) { # 4-byte boolean
         @vals = ReadValue($dataPt, $pos, 'int32u', undef, $size);
         foreach (@vals) {
@@ -598,7 +597,6 @@ sub ReadASF($$$$$)
 sub ProcessExtendedContentDescription($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;
@@ -611,7 +609,7 @@ sub ProcessExtendedContentDescription($$$)
         my $nameLen = unpack("x${pos}v", $$dataPt);
         $pos += 2;
         return 0 if $pos + $nameLen + 4 > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$nameLen),'v');
+        my $tag = Image::ExifTool::Decode(undef,substr($$dataPt,$pos,$nameLen),'UCS2','II','Latin');
         $tag =~ s/^WM\///; # remove leading "WM/"
         $pos += $nameLen;
         my ($dType, $dLen) = unpack("x${pos}v2", $$dataPt);
@@ -630,10 +628,9 @@ sub ProcessExtendedContentDescription($$$)
 # Process WM/Picture preview
 # Inputs: 0) ExifTool object reference, 1) dirInfo ref, 2) tag table reference
 # Returns: 1 on success
-sub ProcessPreview($$$)
+sub ProcessPicture($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
@@ -645,10 +642,10 @@ sub ProcessPreview($$$)
     my $n = $dirLen - 5 - $picLen;
     return 0 if $n & 0x01 or $n < 4;
     my $str = substr($$dataPt, $dirStart+5, $n);
-    if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/) {
+    if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/s) {
         my ($mime, $desc) = ($1, $2);
-        $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Unicode2Charset($mime,'II'));
-        $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Unicode2Charset($desc,'II')) if length $desc;
+        $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Decode($mime,'UCS2','II'));
+        $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Decode($desc,'UCS2','II')) if length $desc;
     }
     $exifTool->HandleTag($tagTablePtr, 3, substr($$dataPt, $dirStart+5+$n, $picLen));
     return 1;
@@ -661,7 +658,6 @@ sub ProcessPreview($$$)
 sub ProcessCodecList($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 20;
@@ -677,12 +673,12 @@ sub ProcessCodecList($$$)
         my $nameLen = Get16u($dataPt, $pos + 2) * 2;
         $pos += 4;
         return 0 if $pos + $nameLen + 2 > $dirLen;
-        my $name = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$nameLen),'II');
+        my $name = $exifTool->Decode(substr($$dataPt,$pos,$nameLen),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, "${type}Name", $name);
         my $descLen = Get16u($dataPt, $pos + $nameLen) * 2;
         $pos += $nameLen + 2;
         return 0 if $pos + $descLen + 2 > $dirLen;
-        my $desc = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$descLen),'II');
+        my $desc = $exifTool->Decode(substr($$dataPt,$pos,$descLen),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, "${type}Description", $desc);
         my $infoLen = Get16u($dataPt, $pos + $descLen);
         $pos += $descLen + 2 + $infoLen;
@@ -697,7 +693,6 @@ sub ProcessCodecList($$$)
 sub ProcessMetadata($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;
@@ -710,7 +705,7 @@ sub ProcessMetadata($$$)
         my ($index, $stream, $nameLen, $dType, $dLen) = unpack("x${pos}v4V", $$dataPt);
         $pos += 12;
         return 0 if $pos + $nameLen + $dLen > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$nameLen),'v');
+        my $tag = Image::ExifTool::Decode(undef,substr($$dataPt,$pos,$nameLen),'UCS2','II','Latin');
         my $val = ReadASF($exifTool,$dataPt,$pos+$nameLen,$dType,$dLen);
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             DataPt => $dataPt,
@@ -755,7 +750,18 @@ sub ProcessASF($$;$)
             last;
         }
         if ($size > 0x7fffffff) {
-            $err = 'Large ASF objects not supported';
+            if ($size > 0x7fffffff * 4294967296) {
+                $err = 'Invalid ASF object size';
+            } elsif ($exifTool->Options('LargeFileSupport')) {
+                if ($raf->Seek($size, 1)) {
+                    $exifTool->VPrint(0, "  Skipped large ASF object ($size bytes)\n");
+                    $pos += $size;
+                    next;
+                }
+                $err = 'Error seeking past large ASF object';
+            } else {
+                $err = 'Large ASF objects not supported (LargeFileSupport not set)';
+            }
             last;
         }
         # go back to parent tag table if done with previous children
@@ -843,7 +849,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
