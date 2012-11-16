@@ -26,6 +26,10 @@
 		<fits-xml-namespace>http://hul.harvard.edu/ois/xml/ns/fits/fits_output</fits-xml-namespace>
 	</output>
 	
+	<process>
+		<max-threads>20</max-threads>
+	</process>
+	
 	<!-- file name of the droid signature file to use in tools/droid/-->
 	<droid_sigfile>DROID_SignatureFile_V35.xml</droid_sigfile>
 	

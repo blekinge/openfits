@@ -143,6 +143,15 @@ public abstract class ToolBase implements Tool {
 			//System.out.println(new java.sql.Time(time2.getTime()) +" FINISHED "+this.getClass());
 		} catch (FitsToolException e) {
 			e.printStackTrace();
+			// GDM 16-Nov-2012 Provide additional exception information
+			Throwable cause = e.getCause();
+			if (cause != null) {
+			    System.out.println ("Caused by " + cause.getClass().getName());
+			    String msg = cause.getMessage ();
+			    if (msg != null) {
+			        System.out.println (msg);
+			    }
+			}
 			//System.err.println(e.getMessage());
 		}
 	}

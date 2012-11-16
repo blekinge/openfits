@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -72,6 +73,7 @@ public class Fits {
 	public static boolean validateToolOutput;
 	public static String externalOutputSchema;
 	public static String internalOutputSchema;
+	public static int maxThreads = 20;       // GDM 16-Nov-2012
 	public static final String XML_NAMESPACE = "http://hul.harvard.edu/ois/xml/ns/fits/fits_output";
 	
 	public static String VERSION = "0.6.1";
@@ -118,9 +120,25 @@ public class Fits {
 		} catch (Exception  e) {
 			throw new FitsConfigurationException("Error creating FITS XML Mapper",e);
 		} 
-		validateToolOutput = config.getBoolean("output.validate-tool-output");
-		externalOutputSchema   = config.getString("output.external-output-schema");
-		internalOutputSchema   = config.getString("output.internal-output-schema");
+		// required config values
+		try {
+		    validateToolOutput = config.getBoolean("output.validate-tool-output");
+		    externalOutputSchema   = config.getString("output.external-output-schema");
+		    internalOutputSchema   = config.getString("output.internal-output-schema");
+		}
+		catch (NoSuchElementException e) {
+		    System.out.println ("Error inconfiguration file: " + e.getMessage());
+		    return;
+		}
+		// optional config values GDM 16-Nov-2012
+		try {
+		    maxThreads = config.getShort("process.max-threads");
+		}
+		catch (NoSuchElementException e) { }
+		if (maxThreads < 1) {
+		    // If invalid number specified, use a default.
+		    maxThreads = 20;
+		}
 		
 		String consolidatorClass = config.getString("output.dataConsolidator[@class]");
 		try {
@@ -409,12 +427,21 @@ public class Fits {
 		String ext = path.substring(path.lastIndexOf(".")+1);
 		
 		ArrayList<Thread> threads = new ArrayList<Thread>();
+		// GDM 16-Nov-12: Implement limit on maximum threads
 		for(Tool t : toolbelt.getTools()) {			
 			if(t.isEnabled()) {
 				if(!t.hasExcludedExtension(ext)) {
+				    // Don't exceed the maximum thread count
+				    while (countActiveTools(threads) >= maxThreads) {
+				        try {
+				            Thread.sleep(200);
+				        }
+				        catch (InterruptedException e) {}
+				    }
 					//spin up new threads
 					t.setInputFile(input);
-					Thread thread = new Thread(t);
+					// GDM 16-Nov-12: Name the threads as a debugging aid
+					Thread thread = new Thread(t, t.getToolInfo().getName());
 					threads.add(thread);
 					thread.start();
 				}
@@ -448,6 +475,17 @@ public class Fits {
 	
 	public ToolBelt getToolbelt() {
 		return toolbelt;
+	}
+	
+	/* Count up all the threads that are still running */
+	private int countActiveTools (List<Thread> threads) {
+	    int count = 0;
+	    for (Thread t : threads) {
+	        if (t.isAlive()) {
+	            ++count;
+	        }
+	    }
+	    return count;
 	}
 
 }
