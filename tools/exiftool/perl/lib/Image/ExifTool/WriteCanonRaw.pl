@@ -4,12 +4,19 @@
 # Description:  Write Canon RAW (CRW and CR2) meta information
 #
 # Revisions:    01/25/2005 - P. Harvey Created
+#               09/16/2010 - PH Added ability to write XMP in CRW images
 #------------------------------------------------------------------------------
 package Image::ExifTool::CanonRaw;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool::Fixup;
+
+# map for adding directories to CRW
+my %crwMap = (
+    XMP      => 'CanonVRD',
+    CanonVRD => 'Trailer',
+);
 
 # mappings to from RAW tagID to MakerNotes tagID
 # (Note: upper two bits of RawTagID are zero)
@@ -76,7 +83,6 @@ sub BuildMakerNotes($$$$$$)
     # special case: ignore user comment because it gets saved in EXIF
     # (and has the same raw tagID as CanonFileDescription)
     return if $tagInfo and $$tagInfo{Name} eq 'UserComment';
-    my $tagType = ($rawTag >> 8) & 0x38;
     my $format = $Image::ExifTool::Exif::formatNumber{$formName};
     my $fsiz = $Image::ExifTool::Exif::formatSize[$format];
     my $size = length($$valuePt);
@@ -191,8 +197,8 @@ sub WriteCR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt} or return 0;
-    my $raf = $$dirInfo{RAF} or return 0;
     my $outfile = $$dirInfo{OutFile} or return 0;
+    $$dirInfo{RAF} or return 0;
 
     # check CR2 signature
     if ($$dataPt !~ /^.{8}CR\x02\0/s) {
@@ -240,13 +246,13 @@ sub WriteCR2($$$)
 # Write CanonRaw (CRW) information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) tag table reference
-# Returns: true on sucess
+# Returns: true on success
 # Notes: Increments ExifTool CHANGED flag for each tag changed This routine is
 # different from all of the other write routines because Canon RAW files are
 # designed well!  So it isn't necessary to buffer the data in memory before
 # writing it out.  Therefore this routine doesn't return the directory data as
 # the rest of the Write routines do.  Instead, it writes to the dirInfo
-# Outfile on the fly --> much faster, efficient, and less demanding on memory!
+# OutFile on the fly --> much faster, efficient, and less demanding on memory!
 sub WriteCanonRaw($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -425,8 +431,8 @@ sub WriteCanonRaw($$$)
                     $oldVal = $value;
                 }
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($nvHash, $oldVal)) {
-                    my $newVal = Image::ExifTool::GetNewValues($nvHash);
+                if ($exifTool->IsOverwriting($nvHash, $oldVal)) {
+                    my $newVal = $exifTool->GetNewValues($nvHash);
                     my $verboseVal;
                     $verboseVal = $newVal if $verbose > 1;
                     # convert to specified format if necessary
@@ -522,6 +528,10 @@ sub WriteCRW($$)
             return 1;
         }
     }
+    # make XMP the preferred group for CRW files
+    if ($$exifTool{FILE_TYPE} eq 'CRW') {
+        $exifTool->InitWriteDirs(\%crwMap, 'XMP');
+    }
 
     # write header
     $raf->Seek(0, 0)            or return 0;
@@ -562,6 +572,16 @@ sub WriteCRW($$)
     if ($success) {
         # add CanonVRD trailer if writing as a block
         $trailPt = $exifTool->AddNewTrailers($trailPt,'CanonVRD');
+        if (not $trailPt and $$exifTool{ADD_DIRS}{CanonVRD}) {
+            # create CanonVRD from scratch if necessary
+            my $outbuff = '';
+            my $saveOrder = GetByteOrder();
+            require Image::ExifTool::CanonVRD;
+            if (Image::ExifTool::CanonVRD::ProcessCanonVRD($exifTool, { OutFile => \$outbuff }) > 0) {
+                $trailPt = \$outbuff;
+            }
+            SetByteOrder($saveOrder);
+        }
         # write trailer
         if ($trailPt) {
             # must append DirStart pointer to end of trailer
@@ -603,7 +623,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

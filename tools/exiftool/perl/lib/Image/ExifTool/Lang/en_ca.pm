@@ -8,15 +8,27 @@
 
 package Image::ExifTool::Lang::en_ca;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.06';
 
 %Image::ExifTool::Lang::en_ca::Translate = (
    'AlternateDuotoneColors' => 'Alternate Duotone Colours',
    'AlternateSpotColors' => 'Alternate Spot Colours',
+   'ArtFilter' => {
+      PrintConv => {
+        'Pale & Light Color' => 'Pale & Light Colour',
+      },
+    },
    'BackgroundColor' => 'Background Colour',
-   'BackgroundColorIndicator' => 'Background Colour Indicator',
+   'BackgroundColorIndicator' => {
+      Description => 'Background Colour Indicator',
+      PrintConv => {
+        'Specified Background Color' => 'Specified Background Colour',
+        'Unspecified Background Color' => 'Unspecified Background Colour',
+      },
+    },
    'BackgroundColorValue' => 'Background Colour Value',
    'BasicColorImageSequence' => 'Basic Colour Image Sequence',
    'BkColor' => 'Background Colour',
@@ -49,7 +61,6 @@ $VERSION = '1.02';
    'ColorAverages' => 'Colour Averages',
    'ColorBW' => 'Colour BW',
    'ColorBalance' => 'Colour Balance',
-   'ColorBalance1' => 'Colour Balance 1',
    'ColorBalanceAdj' => 'Colour Balance Adj',
    'ColorBalanceBlue' => 'Colour Balance Blue',
    'ColorBalanceGreen' => 'Colour Balance Green',
@@ -64,9 +75,10 @@ $VERSION = '1.02';
    'ColorCasts' => 'Colour Casts',
    'ColorCharacterization' => 'Colour Characterization',
    'ColorClass' => 'Colour Class',
+   'ColorCompensationFilter' => 'Colour Compensation Filter',
    'ColorComponents' => 'Colour Components',
    'ColorControl' => 'Colour Control',
-   'ColorDataUnknown' => 'Colour Data Unknown',
+   'ColorCorrection' => 'Colour Correction',
    'ColorDataVersion' => 'Colour Data Version',
    'ColorEffect' => 'Colour Effect',
    'ColorFilter' => 'Colour Filter',
@@ -105,6 +117,7 @@ $VERSION = '1.02';
    'ColorProfile' => 'Colour Profile',
    'ColorRepresentation' => 'Colour Representation',
    'ColorReproduction' => 'Colour Reproduction',
+   'ColorResolutionDepth' => 'Colour Resolution Depth',
    'ColorResponseUnit' => 'Colour Response Unit',
    'ColorSamplersResource' => 'Colour Samplers Resource',
    'ColorSequence' => 'Colour Sequence',
@@ -151,8 +164,15 @@ $VERSION = '1.02';
    'ColorTempUnknown8' => 'Colour Temp Unknown 8',
    'ColorTempUnknown9' => 'Colour Temp Unknown 9',
    'ColorTemperature' => 'Colour Temperature',
+   'ColorTemperatureAdj' => 'Colour Temperature Adj',
    'ColorTemperatureBG' => 'Colour Temperature BG',
    'ColorTemperatureRG' => 'Colour Temperature RG',
+   'ColorTemperatureSetting' => {
+      Description => 'Colour Temperature Setting',
+      PrintConv => {
+        'Color Filter' => 'Colour Filter',
+      },
+    },
    'ColorTone' => 'Colour Tone',
    'ColorToneAdj' => 'Colour Tone Adj',
    'ColorToneFaithful' => 'Colour Tone Faithful',
@@ -192,14 +212,27 @@ $VERSION = '1.02';
    'ColorantOrder' => 'Colourant Order',
    'ColorantRed' => 'Colourant Red',
    'ColorantSwatchName' => 'Colourant Swatch Name',
+   'ColorantTableOut' => 'Colourant Table Out',
    'ColorantType' => 'Colourant Type',
    'ColorantYellow' => 'Colourant Yellow',
    'ColorimetricReference' => 'Colourimetric Reference',
    'Colors' => 'Colours',
-   'Colorspace' => 'Colourspace',
+   'ColorSpace' => 'Colour Space',
    'Compression' => {
       PrintConv => {
         'JBIG Color' => 'JBIG Colour',
+      },
+    },
+   'ContrastMode' => {
+      PrintConv => {
+        'Dynamic (Color Film)' => 'Dynamic (Colour Film)',
+        'Dynamic Art (My Color)' => 'Dynamic Art (My Colour)',
+        'Elegant (My Color)' => 'Elegant (My Colour)',
+        'Nature (Color Film)' => 'Nature (Colour Film)',
+        'Nostalgic (Color Film)' => 'Nostalgic (Colour Film)',
+        'Retro (My Color)' => 'Retro (My Colour)',
+        'Smooth (Color Film) or Pure (My Color)' => 'Smooth (Colour Film) or Pure (My Colour)',
+        'Vibrant (Color Film) or Expressive (My Color)' => 'Vibrant (Colour Film) or Expressive (My Colour)',
       },
     },
    'D-LightingHQColorBoost' => 'D-Lighting HQ Colour Boost',
@@ -224,6 +257,7 @@ $VERSION = '1.02';
         'My Colors' => 'My Colours',
       },
     },
+   'FaithfulRawColorTone' => 'Faithful Raw Colour Tone',
    'FaxProfile' => {
       PrintConv => {
         'Lossless color and grayscale, L' => 'Lossless colour and grayscale, L',
@@ -239,8 +273,12 @@ $VERSION = '1.02';
         'Standard (color)' => 'Standard (colour)',
       },
     },
+   'FlashColorFilter' => 'Flash Colour Filter',
+   'GenOpColor' => 'Gen Op Colour',
    'GreenPaletteColorTableData' => 'Green Palette Colour Table Data',
    'GreenPaletteColorTableDescriptor' => 'Green Palette Colour Table Descriptor',
+   'HasColorMap' => 'Has Colour Map',
+   'HighlightColorDistortReduct' => 'Highlight Colour Distort Reduct',
    'HiliteColor' => 'Highlight Colour',
    'ImageAlterationConstraints' => {
       PrintConv => {
@@ -248,15 +286,30 @@ $VERSION = '1.02';
         'No De-Colorization' => 'No De-Colourization',
       },
     },
-   'ImageColorIndicator' => 'Image Colour Indicator',
-   'ImageColorValue' => 'Image Colour Value',
-   'ImageProcessing' => {
+   'ImageColor' => 'Image Colour',
+   'ImageColorIndicator' => {
+      Description => 'Image Colour Indicator',
       PrintConv => {
-        'Color Filter' => 'Colour Filter',
+        'Specified Image Color' => 'Specified Image Colour',
+        'Unspecified Image Color' => 'Unspecified Image Colour',
       },
     },
+   'ImageColorValue' => 'Image Colour Value',
    'InterchangeColorSpace' => 'Interchange Colour Space',
+   'LandscapeRawColorTone' => 'Landscape Raw Colour Tone',
+   'LargeBluePaletteColorTableData' => 'Large Blue Palette Colour Table Data',
+   'LargeBluePaletteColorTableDescr' => 'Large Blue Palette Colour Table Descr',
+   'LargeGreenPaletteColorTableData' => 'Large Green Palette Colour Table Data',
+   'LargeGreenPaletteColorTableDescr' => 'Large Green Palette Colour Table Descr',
+   'LargePaletteColorLookupTableUID' => 'Large Palette Colour Lookup Table UID',
+   'LargeRedPaletteColorTableData' => 'Large Red Palette Colour Table Data',
+   'LargeRedPaletteColorTableDescr' => 'Large Red Palette Colour Table Descr',
    'MDColorTable' => 'MD Colour Table',
+   'MagicFilter' => {
+      PrintConv => {
+        'Pale & Light Color' => 'Pale & Light Colour',
+      },
+    },
    'MandatoryBackground' => {
       PrintConv => {
         'Color Advisory, Image Mandatory' => 'Colour Advisory, Image Mandatory',
@@ -276,6 +329,7 @@ $VERSION = '1.02';
     },
    'NamedColor' => 'Named Colour',
    'NamedColor2' => 'Named Colour 2',
+   'NeutralRawColorTone' => 'Neutral Raw Colour Tone',
    'NewColorType' => 'New Colour Type',
    'NumColors' => 'Num Colours',
    'NumImportantColors' => 'Num Important Colours',
@@ -293,38 +347,25 @@ $VERSION = '1.02';
       },
     },
    'Photoshop2ColorTable' => 'Photoshop 2 Colour Table',
-   'PreviewColorSpace' => 'Preview Colour Space',
-   'PreviewType' => {
+   'PictureType' => {
       PrintConv => {
-        'A bright colored fish' => 'A bright coloured fish',
+        'Bright(ly) Colored Fish' => 'Bright(ly) Coloured Fish',
       },
     },
+   'PortraitRawColorTone' => 'Portrait Raw Colour Tone',
+   'PresetWhiteBalance' => {
+      PrintConv => {
+        'Color Temperature' => 'Colour Temperature',
+      },
+    },
+   'PreviewColorSpace' => 'Preview Colour Space',
    'ProfileClass' => {
       PrintConv => {
         'ColorSpace Conversion Profile' => 'ColourSpace Conversion Profile',
         'NamedColor Profile' => 'Named Colour Profile',
       },
     },
-   'ProjectedCSType' => {
-      PrintConv => {
-        'NAD27 Colorado Central' => 'NAD27 Colourado Central',
-        'NAD27 Colorado North' => 'NAD27 Colourado North',
-        'NAD27 Colorado South' => 'NAD27 Colourado South',
-        'NAD83 Colorado Central' => 'NAD83 Colourado Central',
-        'NAD83 Colorado North' => 'NAD83 Colourado North',
-        'NAD83 Colorado South' => 'NAD83 Colourado South',
-      },
-    },
-   'Projection' => {
-      PrintConv => {
-        'Colorado CS27 Central' => 'Colourado CS27 Central',
-        'Colorado CS27 North' => 'Colourado CS27 North',
-        'Colorado CS27 South' => 'Colourado CS27 South',
-        'Colorado CS83 Central' => 'Colourado CS83 Central',
-        'Colorado CS83 North' => 'Colourado CS83 North',
-        'Colorado CS83 South' => 'Colourado CS83 South',
-      },
-    },
+   'PseudoColorType' => 'Pseudo Colour Type',
    'QuantizationMethod' => {
       PrintConv => {
         'Color Space Specific' => 'Colour Space Specific',
@@ -334,9 +375,14 @@ $VERSION = '1.02';
    'RGBFgCol' => 'Foreground Colour',
    'ROIDisplayColor' => 'ROI Display Colour',
    'RawColorAdj' => 'Raw Colour Adj',
-   'RawColorToneAdj' => 'Raw Colour Tone Adj',
    'RawDevColorSpace' => 'Raw Dev Colour Space',
    'RawDevMemoryColorEmphasis' => 'Raw Dev Memory Colour Emphasis',
+   'RawDevSettings' => {
+      PrintConv => {
+        'Color Space' => 'Colour Space',
+        'WB Color Temp' => 'WB Colour Temp',
+      },
+    },
    'RawDevWhiteBalance' => {
       PrintConv => {
         'Color Temperature' => 'Colour Temperature',
@@ -350,6 +396,12 @@ $VERSION = '1.02';
         'Media-Relative Colorimetric' => 'Media-Relative Colourimetric',
       },
     },
+   'RetouchHistory' => {
+      PrintConv => {
+        'Color Custom' => 'Colour Custom',
+        'Color Outline' => 'Colour Outline',
+      },
+    },
    'SBAInputImageColorspace' => 'SBA Input Image Colourspace',
    'SRGBRendering' => {
       PrintConv => {
@@ -360,8 +412,10 @@ $VERSION = '1.02';
    'SceneMode' => {
       PrintConv => {
         'Color Effects' => 'Colour Effects',
+        'My Color' => 'My Colour',
       },
     },
+   'ScreenMinimumColorBitDepth' => 'Screen Minimum Colour Bit Depth',
    'SegmentedBlueColorTableData' => 'Segmented Blue Colour Table Data',
    'SegmentedGreenColorTableData' => 'Segmented Green Colour Table Data',
    'SegmentedRedColorTableData' => 'Segmented Red Colour Table Data',
@@ -377,14 +431,18 @@ $VERSION = '1.02';
    'ShootingMode' => {
       PrintConv => {
         'Color Effects' => 'Colour Effects',
+        'My Color' => 'My Colour',
       },
     },
+   'ShutterPresentationColorCIELabVal' => 'Shutter Presentation Colour CIE Lab Val',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
         'Colored' => 'Coloured',
       },
     },
+   'StandardRawColorTone' => 'Standard Raw Colour Tone',
    'StdOutputColorMode' => 'Std Output Colour Mode',
+   'StreamColor' => 'Stream Colour',
    'SubfileType' => {
       PrintConv => {
         'Color IW44' => 'Colour IW44',
@@ -403,6 +461,11 @@ $VERSION = '1.02';
       },
     },
    'UCRBG' => 'Under Colour Removal & Black Gen.',
+   'USPTOOriginalContentType' => {
+      PrintConv => {
+        'Color' => 'Colour',
+      },
+    },
    'UltrasoundColorDataPresent' => 'Ultrasound Colour Data Present',
    'Unsharp1Color' => 'Unsharp 1 Colour',
    'Unsharp2Color' => 'Unsharp 2 Colour',
@@ -430,7 +493,7 @@ $VERSION = '1.02';
     },
    'WhiteBalance' => {
       PrintConv => {
-        'Color Temperature/Color Filter' => 'Color Temperature/Colour Filter',
+        'Color Temperature/Color Filter' => 'Colour Temperature/Colour Filter',
       },
     },
    'WhiteBalanceSet' => {
@@ -438,6 +501,11 @@ $VERSION = '1.02';
         'Set Color Temperature 1' => 'Set Colour Temperature 1',
         'Set Color Temperature 2' => 'Set Colour Temperature 2',
         'Set Color Temperature 3' => 'Set Colour Temperature 3',
+      },
+    },
+   'WhiteBalanceSetting' => {
+      PrintConv => {
+        'Color Temperature/Color Filter' => 'Colour Temperature/Colour Filter',
       },
     },
    'WorkColorSpace' => {
@@ -476,7 +544,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

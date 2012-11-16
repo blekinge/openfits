@@ -9,7 +9,6 @@
 #               2) Christian Koller private communication (20D)
 #               3) Rainer Honle private communication (5D)
 #               4) David Pitcher private communication (1DmkIII firmware upgrade)
-#               5) Laurent Clevy private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonCustom;
@@ -20,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.43';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -976,7 +975,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
-    NOTES => 'Custom functions for the EOS-D30 and D60.',
+    NOTES => 'Custom functions for the EOS D30 and D60.',
     WRITABLE => 'int8u',
     1 => {
         Name => 'LongExposureNoiseReduction',
@@ -1150,7 +1149,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val*4)*log(2))*1000/8',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*8/1000)/log(2))/4',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     5 => {
         Name => 'PF4ExposureTimeMax',
@@ -1158,7 +1157,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val*4)*log(2))*1000/8',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*8/1000)/log(2))/4',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     6 => {
         Name => 'PF5ApertureMin',
@@ -1217,8 +1216,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0101 => [
         {
             Name => 'ExposureLevelIncrements',
-            Notes => '1D Mark III',
             Condition => '$$self{Model} =~ /\b1Ds?\b/',
+            Notes => '1DmkIII and 1DmkIV',
             PrintConv => {
                 0 => '1/3-stop set, 1/3-stop comp.',
                 1 => '1-stop set, 1/3-stop comp.',
@@ -1243,17 +1242,9 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0103 => [
         {
-            Name => 'ISOExpansion',
-            Condition => '$$self{Model} =~ /\b(40D|50D|5D Mark II)\b/',
-            Notes => '40D, 50D and 5DmkII',
-            PrintConv => {
-                0 => 'Off',
-                1 => 'On',
-            },
-        },
-        {
             Name => 'ISOSpeedRange',
-            Notes => '1D Mark III',
+            Condition => '$$self{Model} =~ /\b1D/',
+            Notes => '1DmkIII and 1DmkIV',
             Count => 3,
             # (this decoding may not be valid for CR2 images?)
             ValueConv => [
@@ -1279,6 +1270,14 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
                 '$val=~/(-?[\d.]+)/ ? $1 : 0',
             ],
         },
+        {
+            Name => 'ISOExpansion',
+            Notes => 'other models',
+            PrintConv => {
+                0 => 'Off',
+                1 => 'On',
+            },
+        },
     ],
     0x0104 => {
         Name => 'AEBAutoCancel',
@@ -1286,7 +1285,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0105 => {
         Name => 'AEBSequence',
-        Notes => 'value of 2 not used by 40D, 50D and 5DmkII',
+        Notes => 'value of 2 not used by 40D, 50D, 60D, 5DmkII and 7D',
         PrintConv => {
             0 => '0,-,+',
             1 => '-,0,+',
@@ -1295,12 +1294,14 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0106 => {
         Name => 'AEBShotCount',
-        PrintConv => {
+        Count => -1,
+        Notes => '1 value for the 1DmkIII and 5DmkIII, 2 for the 1DmkIV',
+        PrintConv => [{
             0 => 3,
             1 => 2,
             2 => 5,
             3 => 7,
-        },
+        }],
     },
     0x0107 => {
         Name => 'SpotMeterLinkToAFPoint',
@@ -1311,7 +1312,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0108 => {
         Name => 'SafetyShift',
-        Notes => 'value of 2 not used by 40D, 50D and 5DmkII',
+        Notes => 'value of 2 not used by 40D, 50D, 60D, 5DmkII and 7D',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable (Tv/Av)',
@@ -1403,9 +1404,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x010e => {
         Name => 'ApplyShootingMeteringMode',
         Count => 8,
-        PrintConv => [
-            \%disableEnable,
-        ],
+        PrintConv => [ \%disableEnable ],
     },
     0x010f => [
         {
@@ -1419,8 +1418,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'FlashSyncSpeedAv',
-            Condition => '$$self{Model} =~ /\b50D\b/',
-            Notes => '50D',
+            Condition => '$$self{Model} =~ /\b(50D|60D|7D)\b/',
+            Notes => '50D, 60D and 7D',
             PrintConv => {
                 0 => 'Auto',
                 1 => '1/250-1/60 Auto',
@@ -1438,23 +1437,43 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'FlashSyncSpeedAv',
-            Condition => '$$self{Model} =~ /\b5D Mark II\b/',
-            Notes => '5D Mark II',
+            Condition => '$$self{Model} =~ /\bEOS-1Ds? Mark III\b/',
+            Notes => '1D Mark III and 1Ds Mark III',
+            PrintConv => {
+                0 => 'Auto',
+                1 => '1/300 Fixed',
+            },
+        },
+        {
+            Name => 'FlashSyncSpeedAv',
+            Condition => '$$self{Model} =~ /\bEOS-1D Mark IV\b/',
+            Notes => '1D Mark IV',
+            PrintConv => {
+                0 => 'Auto',
+                1 => '1/300-1/60 Auto',
+                2 => '1/300 Fixed',
+            },
+        },
+        {
+            Name => 'FlashSyncSpeedAv',
+            Notes => '5D Mark II, 5D Mark III, 500D, 550D, 600D and 1100D',
             PrintConv => {
                 0 => 'Auto',
                 1 => '1/200-1/60 Auto',
                 2 => '1/200 Fixed',
             },
         },
-        {
-            Name => 'FlashSyncSpeedAv',
-            Notes => '1D Mark III',
-            PrintConv => {
-                0 => 'Auto',
-                1 => '1/300 Fixed',
-            },
-        },
     ],
+    0x0110 => { # new for 1DmkIV
+        Name => 'FEMicroadjustment',
+        Count => 3,
+        PrintConv => [ \%disableEnable ],
+    },
+    0x0111 => { # new for 1DmkIV
+        Name => 'AEMicroadjustment',
+        Count => 3,
+        PrintConv => [ \%disableEnable ],
+    },
     #### 2a) Image
     0x0201 => {
         Name => 'LongExposureNoiseReduction',
@@ -1467,13 +1486,16 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0202 => [
         {
             Name => 'HighISONoiseReduction',
-            Condition => '$$self{Model} =~ /\b(50D|5D Mark II|500D|T1i|Kiss X3)\b/',
-            Notes => '50D, 500D and 5DmkII',
+            Condition => q{
+                $$self{Model} =~ /\b(50D|60D|5D Mark II|7D|500D|T1i|Kiss X3|550D|T2i|Kiss X4)\b/ or
+                $$self{Model} =~ /\b(600D|T3i|Kiss X5|1100D|T3|Kiss X50)\b/
+            },
+            Notes => '50D, 60D, 500D, 550D, 600D, 1100D, 5DmkII and 7D',
             PrintConv => {
                 0 => 'Standard',
                 1 => 'Low',
                 2 => 'Strong',
-                3 => 'Disable',
+                3 => 'Off',
             },
         },
         {
@@ -1489,9 +1511,9 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0204 => [
         {
             Name => 'AutoLightingOptimizer',
-            Condition => '$$self{Model} =~ /\b(50D|5D Mark II|500D|T1i|Kiss X3)\b/',
-            Notes => '50D, 500D and 5DmkII',
-            PrintConv => { #5
+            Condition => '$$self{Model} =~ /\b(50D|5D Mark II|500D|T1i|Kiss X3|1D Mark IV)\b/',
+            Notes => '50D, 500D, 5DmkII and 1DmkIV',
+            PrintConv => {
                 0 => 'Standard',
                 1 => 'Low',
                 2 => 'Strong',
@@ -1536,11 +1558,41 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         Name => 'LCDIlluminationDuringBulb',
         PrintConv => \%offOn,
     },
-    0x0409 => {
-        Name => 'InfoButtonWhenShooting',
+    0x0409 => [
+        {
+            Name => 'InfoButtonWhenShooting',
+            Condition => '$$self{Model} =~ /\b1Ds? Mark III\b/',
+            Notes => '1D Mark III',
+            PrintConv => {
+                0 => 'Displays camera settings',
+                1 => 'Displays shooting functions',
+            },
+        },
+        {
+            Name => 'InfoButtonWhenShooting',
+            Notes => '1D Mark IV',
+            PrintConv => {
+                # reversed from earlier models. grr...
+                0 => 'Displays shooting functions',
+                1 => 'Displays camera settings',
+            },
+        },
+    ],
+    0x040a => { # new for 5DmkIII
+        Name => 'ViewfinderWarnings',
+        PrintConv => { BITMASK => { # (NC)
+            0 => 'Monochrome',
+            1 => 'WB corrected',
+            2 => 'One-touch image quality',
+            3 => 'ISO expansion',
+            4 => 'Spot metering',
+        }},
+    },
+    0x040b => { # new for 5DmkIII
+        Name => 'LVShootingAreaDisplay',
         PrintConv => {
-            0 => 'Displays camera settings',
-            1 => 'Displays shooting functions',
+            0 => 'Masked',
+            1 => 'Outlined',
         },
     },
     #### 3a) Auto focus
@@ -1568,6 +1620,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             0 => '1: AF, 2: Tracking',
             1 => '1: AF, 2: Drive speed',
             2 => '1: Release, 2: Drive speed',
+            3 => '1: Release, 2: Tracking', # 7D/1DmkIV
         },
     },
     0x0504 => {
@@ -1595,6 +1648,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             4 => 'One Shot <-> AI servo',
             5 => 'IS start',
             6 => 'Switch to registered AF point',
+            7 => 'Spot AF', # 1DmkIV
         },
     },
     0x0507 => {
@@ -1623,26 +1677,55 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             Name => 'AFPointAreaExpansion',
             PrintConv => {
                 0 => 'Disable',
-                1 => 'Enable (left/right assist points)',
-                2 => 'Enable (surrounding assist points)',
+                1 => 'Left/right AF points',
+                2 => 'Surrounding AF points',
+                3 => 'All 45 points area', # 1DmkIV
             },
         },
     ],
-    0x0509 => {
-        Name => 'SelectableAFPoint',
-        PrintConv => {
-            0 => '19 points',
-            1 => 'Inner 9 points',
-            2 => 'Outer 9 points',
-            3 => '19 Points, Multi-controller selectable', #4
-            4 => 'Inner 9 Points, Multi-controller selectable', #4
-            5 => 'Outer 9 Points, Multi-controller selectable', #4
+    0x0509 => [
+        {
+            Name => 'SelectableAFPoint',
+            Condition => '$$self{Model} =~ /\b1D Mark IV\b/',
+            Notes => '1D Mark IV',
+            PrintConv => {
+                 0 => '45 points',
+                 1 => '19 points',
+                 2 => '11 points',
+                 3 => 'Inner 9 points',
+                 4 => 'Outer 9 points',
+            },
         },
-    },
-    0x050a => {
-        Name => 'SwitchToRegisteredAFPoint',
-        PrintConv => \%disableEnable,
-    },
+        {
+            Name => 'SelectableAFPoint',
+            Notes => 'other models',
+            PrintConv => {
+                0 => '19 points',
+                1 => 'Inner 9 points',
+                2 => 'Outer 9 points',
+                3 => '19 Points, Multi-controller selectable', #4
+                4 => 'Inner 9 Points, Multi-controller selectable', #4
+                5 => 'Outer 9 Points, Multi-controller selectable', #4
+            },
+        },
+    ],
+    0x050a => [
+        {
+            Name => 'SwitchToRegisteredAFPoint',
+            Condition => '$$self{Model} =~ /\b1D Mark IV\b/',
+            Notes => '1D Mark IV',
+            PrintConv => {
+                0 => 'Disable',
+                1 => 'Switch with multi-controller',
+                2 => 'Only while AEL is pressed',
+            },
+        },
+        {
+            Name => 'SwitchToRegisteredAFPoint',
+            Notes => 'other models',
+            PrintConv => \%disableEnable,
+        },
+    ],
     0x050b => {
         Name => 'AFPointAutoSelection',
         PrintConv => {
@@ -1666,27 +1749,65 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             1 => 'Brighter',
         },
     },
-    0x050e => {
-        Name => 'AFAssistBeam',
-        Notes => 'value of 2 not used by 1DmkIII or 5DmkII',
-        PrintConv => {
-            0 => 'Emits',
-            1 => 'Does not emit',
-            2 => 'Only ext. flash emits',
+    0x050e => [
+        {
+            Name => 'AFAssistBeam',
+            Condition => '$$self{Model} =~ /\b1D Mark IV\b/',
+            Notes => '1D Mark IV',
+            PrintConv => {
+                0 => 'Emits',
+                1 => 'Does not emit',
+                2 => 'IR AF assist beam only',
+            },
         },
-    },
-    0x050f => { # new for 40D
-        Name => 'AFPointSelectionMethod',
-        PrintConv => {
-            0 => 'Normal',
-            1 => 'Multi-controller direct',
-            2 => 'Quick Control Dial direct',
+        {
+            Name => 'AFAssistBeam',
+            Notes => 'other models; values 2-3 not used by 1DmkIII or 5DmkII, value 3 new for 7D',
+            PrintConv => {
+                0 => 'Emits',
+                1 => 'Does not emit',
+                2 => 'Only ext. flash emits',
+                3 => 'IR AF assist beam only', # new for 7D
+            },
         },
-    },
-    0x0510 => { # new for 40D
-        Name => 'SuperimposedDisplay',
-        PrintConv => \%onOff,
-    },
+    ],
+    0x050f => [ # new for 40D
+        {
+            Name => 'AFPointSelectionMethod',
+            Condition => '$$self{Model} !~ /\b60D\b/',
+            Notes => '40D, 50D and 5DmkII',
+            PrintConv => {
+                0 => 'Normal',
+                1 => 'Multi-controller direct',
+                2 => 'Quick Control Dial direct',
+            },
+        },
+        {
+            Name => 'AFPointSelectionMethod',
+            Notes => '60D',
+            PrintConv => {
+                0 => 'AF point button: Activate AF Sel; Rear dial: Select AF points',
+                1 => 'AF point button: Auto selection; Rear dial: Manual selection',
+            },
+        },
+    ],
+    0x0510 => [ # new for 40D
+        {
+            Name => 'VFDisplayIllumination',
+            Condition => '$$self{Model} =~ /\b7D\b/',
+            Notes => '7D',
+            PrintConv => {
+                0 => 'Auto',
+                1 => 'Enable',
+                2 => 'Disable',
+            },
+        },
+        {
+            Name => 'SuperimposedDisplay',
+            Notes => 'other models',
+            PrintConv => \%onOff,
+        },
+    ],
     0x0511 => [ # new for 40D
         {
             Name => 'AFDuringLiveView',
@@ -1704,10 +1825,51 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             },
         },
     ],
+    0x0512 => { # new for 7D
+        Name => 'SelectAFAreaSelectMode',
+        PrintConv => [
+            {
+                0 => 'Disable',
+                1 => 'Enable',
+                2 => 'Register',
+                3 => 'Select AF-modes',
+            },
+            # must decode 2nd value
+        ],
+    },
+    0x0513 => { # new for 7D
+        Name => 'ManualAFPointSelectPattern',
+        PrintConv => {
+            0 => 'Stops at AF area edges',
+            1 => 'Continuous',
+        },
+    },
+    0x0514 => { # new for 7D
+        Name => 'DisplayAllAFPoints',
+        PrintConv => \%enableDisable,
+    },
+    0x0515 => { # new for 7D
+        Name => 'FocusDisplayAIServoAndMF',
+        PrintConv => \%enableDisable,
+    },
+    0x0516 => { # new for 7D and 1DmkIV
+        Name => 'OrientationLinkedAFPoint',
+        PrintConv => {
+            0 => 'Same for verical and horizontal',
+            1 => 'Select different AF points',
+        },
+    },
+    0x0517 => { # new for 1DmkIV
+        Name => 'MultiControllerWhileMetering',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'AF point selection',
+        },
+    },
     #### 3b) Drive
     0x060f => {
         Name => 'MirrorLockup',
-        Notes => 'value of 2 not used by 40D, 50D, 450D, 1000D or 5DmkII',
+        Notes => 'value of 2 not used by some models',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable',
@@ -1744,13 +1906,28 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0701 => [
         {
             Name => 'Shutter-AELock',
-            Condition => '$$self{Model} =~ /\b(1000D|XS|Kiss F)\b/',
-            Notes => '1000D',
+            Condition => q{
+                $$self{Model} =~ /\b(1000D|XS|Kiss F|500D|T1i|Kiss X3|550D|T2i|Kiss X4)\b/ or
+                $$self{Model} =~ /\b(600D|T3i|Kiss X5|1100D|T3|Kiss X50)\b/
+            },
+            Notes => '500D, 550D, 600D, 1000D and 1100D',
             PrintConv => {
                 0 => 'AF/AE lock',
                 1 => 'AE lock/AF',
                 2 => 'AF/AF lock, No AE lock',
                 3 => 'AE/AF, No AE lock',
+            },
+        },
+        {
+            Name => 'AFAndMeteringButtons',
+            Condition => '$$self{Model} =~ /\b60D\b/',
+            Notes => '60D',
+            PrintConv => {
+                0 => 'Metering start',
+                1 => 'Metering + AF start',
+                2 => 'AE lock',
+                3 => 'AF stop',
+                4 => 'No function',
             },
         },
         {
@@ -1761,7 +1938,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
                 1 => 'Metering + AF start/AF stop',
                 2 => 'Metering start/Meter + AF start',
                 3 => 'AE lock/Metering + AF start',
-                4 => 'Metering + AF start / disable',
+                4 => 'Metering + AF start/disable',
             },
         },
     ],
@@ -1796,14 +1973,41 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'SetButtonWhenShooting',
-            Condition => '$$self{Model} =~ /\b(450D|XSi|Kiss X2)\b/',
-            Notes => '450D',
+            Condition => '$$self{Model} =~ /\b60D\b/',
+            Notes => '60D',
+            PrintConv => {
+                0 => 'Normal (disabled)',
+                1 => 'Image quality',
+                2 => 'Picture style',
+                3 => 'White balance',
+                4 => 'Flash exposure compensation',
+                5 => 'Viewfinder leveling gauge',
+            },
+        },
+        {
+            Name => 'SetButtonWhenShooting',
+            Condition => '$$self{Model} =~ /\b(450D|XSi|Kiss X2|550D|T2i|Kiss X4|600D|T3i|Kiss X5)\b/',
+            Notes => '450D, 550D and 600D; value of 5 is new for 550D',
             PrintConv => {
                 0 => 'Normal (disabled)',
                 1 => 'Image quality',
                 2 => 'Flash exposure compensation',
                 3 => 'LCD monitor On/Off',
                 4 => 'Menu display',
+                5 => 'ISO speed',
+            },
+        },
+        {
+            Name => 'SetButtonWhenShooting',
+            Condition => '$$self{Model} =~ /\b(1100D|T3|Kiss X50)\b/',
+            Notes => '1100D',
+            PrintConv => {
+                0 => 'Normal (disabled)',
+                1 => 'Image quality',
+                2 => 'Flash exposure compensation',
+                3 => 'LCD monitor On/Off',
+                4 => 'Menu display',
+                5 => 'Depth-of-field preview',
             },
         },
         {
@@ -1820,7 +2024,20 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'SetButtonWhenShooting',
-            Notes => '1D Mark III',
+            Condition => '$$self{Model} =~ /\b(500D|T1i|Kiss X3)\b/',
+            Notes => '500D',
+            PrintConv => {
+                0 => 'Quick control screen',
+                1 => 'Image quality',
+                2 => 'Flash exposure compensation',
+                3 => 'LCD monitor On/Off',
+                4 => 'Menu display',
+                5 => 'Disabled',
+            },
+        },
+        {
+            Name => 'SetButtonWhenShooting',
+            Notes => '1DmkIII and 1DmkIV',
             PrintConv => {
                 0 => 'Normal (disabled)',
                 1 => 'White balance',
@@ -1862,8 +2079,10 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0709 => {
         Name => 'LockMicrophoneButton',
         PrintConv => {
-            0 => 'Protect (holding:sound rec.)',
-            1 => 'Sound rec. (protect:disable)',
+            # called "sound" in 1DmkIII manual, and "memo" in 1DmkIV manual
+            0 => 'Protect (hold:record memo)',
+            1 => 'Record memo (protect:disable)',
+            2 => 'Play memo (hold:record memo)', # new with 1DmkIV
         },
     },
     0x070a => {
@@ -1883,12 +2102,41 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             4 => 'Live view function settings',
         },
     },
+    0x070c => { # new for 7D
+        Name => 'CustomControls',
+        # (too much stuff to decode)
+    },
+    0x070d => { # new for 1DmkIV
+        Name => 'StartMovieShooting',
+        PrintConv => {
+            0 => 'Default (from LV)',
+            1 => 'Quick start (FEL button)',
+        },
+    },
+    0x070e => { # new for 1100D
+        Name => 'FlashButtonFunction',
+        PrintConv => {
+            0 => 'Raise built-in flash',
+            1 => 'ISO speed',
+        },
+    },
+    0x070f => { # new for 5DmkIII
+        Name => 'MultiFunctionLock',
+        PrintConv => [
+            \%offOn, # (NC)
+            { BITMASK => { # (NC)
+                0 => 'Main dial',
+                1 => 'Quick control dial',
+                2 => 'Multi-controller',
+            }},
+        ],
+    },
     #### 4b) Others
     0x080b => [
         {
             Name => 'FocusingScreen',
-            Condition => '$$self{Model} =~ /\b(40D|50D)\b/',
-            Notes => '40D and 50D',
+            Condition => '$$self{Model} =~ /\b(40D|50D|60D)\b/',
+            Notes => '40D, 50D and 60D',
             PrintConv => {
                 0 => 'Ef-A',
                 1 => 'Ef-D',
@@ -1907,7 +2155,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'FocusingScreen',
-            Notes => '1D Mark III',
+            Notes => '1DmkIII and 1DmkIV',
             PrintConv => {
                 0 => 'Ec-CIV',
                 1 => 'Ec-A,B,C,CII,CIII,D,H,I,L',
@@ -1949,7 +2197,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
     },
     0x080f => {
-        Name => 'AddOriginalDecisionData',
+        Name => 'AddOriginalDecisionData', # called ("image verification" in 1DmkIV manual)
         PrintConv => \%offOn,
     },
     0x0810 => {
@@ -1964,6 +2212,13 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => 'Display',
             1 => 'Retain power off status',
+        },
+    },
+    0x0813 => { # new for 5DmkIII
+        Name => 'DefaultEraseOption',
+        PrintConv => {
+            0 => 'Cancel selected',
+            1 => 'Erase selected',
         },
     },
 );
@@ -2040,15 +2295,15 @@ sub ProcessCanonCustom2($$$)
                 my $tagInfo = $$newTags{$tag};
                 next unless $tagInfo;
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                next unless Image::ExifTool::IsOverwriting($nvHash, $val);
-                my $newVal = Image::ExifTool::GetNewValues($nvHash);
+                next unless $exifTool->IsOverwriting($nvHash, $val);
+                my $newVal = $exifTool->GetNewValues($nvHash);
                 next unless defined $newVal;    # can't delete from a custom table
                 WriteValue($newVal, 'int32s', $num, $dataPt, $recPos);
                 $exifTool->VerboseValue("- CanonCustom:$$tagInfo{Name}", $val);
                 $exifTool->VerboseValue("+ CanonCustom:$$tagInfo{Name}", $newVal);
                 ++$exifTool->{CHANGED};
             } else {
-                # extract the value
+                # save extracted tag
                 my $oldInfo = $$tagTablePtr{$tag};
                 $exifTool->HandleTag($tagTablePtr, $tag, $val,
                     Index  => $i,
@@ -2151,7 +2406,6 @@ sub WriteCanonCustom($$$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $dirName = $$dirInfo{DirName};
-    my $verbose = $exifTool->Options('Verbose');
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     $dataPt = \$newData;
 
@@ -2170,8 +2424,8 @@ sub WriteCanonCustom($$$)
         next unless $tagInfo;
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         $val = ($val & 0xff);
-        next unless Image::ExifTool::IsOverwriting($nvHash, $val);
-        my $newVal = Image::ExifTool::GetNewValues($nvHash);
+        next unless $exifTool->IsOverwriting($nvHash, $val);
+        my $newVal = $exifTool->GetNewValues($nvHash);
         next unless defined $newVal;    # can't delete from a custom table
         Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
         $exifTool->VerboseValue("- $dirName:$$tagInfo{Name}", $val);
@@ -2203,7 +2457,7 @@ Image::ExifTool to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

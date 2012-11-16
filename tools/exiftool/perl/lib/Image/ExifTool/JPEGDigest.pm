@@ -5,14 +5,15 @@
 #
 # Revisions:    2008/09/15 - P. Harvey Created
 #
-# References:   JD - Jens Juttke
+# References:   JD) Jens Duttke
+#               2) Franz Buchinger private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::JPEGDigest;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # the print conversion for the JPEGDigest tag
 my %PrintConv = ( #JD
@@ -1797,6 +1798,21 @@ my %PrintConv = ( #JD
     '22ccf9c976b36da34f48385a09b1951b:11' => 'Apple QuickTime, Quality 1021-1023 (100%)',
     '4aa632db3be6b6e85565c1fe66cb22d1:11' => 'Apple QuickTime, Quality 1024 (lossless)',
 
+    # Apple Aperture 2.1.3 (ref 2)
+    '60cb2afa0cfa7395635a9360fc690b46:221111' => 'Apple Aperture Quality 0',
+    '6b9be09d6ec6491a20c2827dbeb678c0:221111' => 'Apple Aperture Quality 1',
+    'dbb17a02e661f2475411fc1dc37902ef:221111' => 'Apple Aperture Quality 2',
+    '8a5df2b5337bf8251c3f66f6adbb5262:221111' => 'Apple Aperture Quality 3',
+    '3841f0f3be30520a1a57f41c449588ee:221111' => 'Apple Aperture Quality 4',
+    '2b1dba266c728a9f46d06e6e5c247953:221111' => 'Apple Aperture Quality 5',
+  # 'Independent JPEG Group library (used by many applications), Quality 91' => 'Apple Aperture Quality 6',
+    '93818f3a0e6d491500cb62e1f683da22:221111' => 'Apple Aperture Quality 7',
+    '8c0c36696a99fd889e0f0c7d64824f3c:221111' => 'Apple Aperture Quality 8',
+    '043645382c79035b6f2afc62d373a37f:221111' => 'Apple Aperture Quality 9',
+    '558d017ce6d5b5282ce76727fe99b91e:221111' => 'Apple Aperture Quality 10',
+    '0b52b82694040193aee10e8074cd7ad5:221111' => 'Apple Aperture Quality 11',
+  # 'Independent JPEG Group library (used by many applications), Quality 100' => 'Apple Aperture Quality 12',
+
     # Tested with Corel Paint Shop Pro PHOTO X2 (Win) - Different subsamplings possible
     '1c78c0daaa0bbfd4a1678b5569b0fa13' => 'Corel Paint Shop Pro PHOTO, Quality 1',
     '5ffdd2e918ec293efc79083703737290' => 'Corel Paint Shop Pro PHOTO, Quality 2',
@@ -2420,8 +2436,6 @@ my %PrintConv = ( #JD
     'f74b3853185743c111ccb13e6febdc21:211111' => 'Pentax Optio T20 (B)',
     'b6640d3879f9922708d23e6adb3d61c9:211111' => 'Pentax Optio V10, Best',
     '253467dc35dfbb32cb3d619fc635d689:211111' => 'Pentax Optio V20/W60, Best',
-    
-    
 
     # Sony
     '6bd350bf5df27ed1b5bf1d83fa9d021f:211111' => 'Sony DSLR-A700, Fine',
@@ -2478,14 +2492,15 @@ some image identification from JPEG data alone.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jens Duttke for most of the work that went into this module.
+Thanks to Jens Duttke for most of the work that went into this module, and
+to Franz Buchinger for the values he added.
 
 =head1 SEE ALSO
 

@@ -81,27 +81,23 @@ public class FileUtility extends ToolBase {
 	}
 
 	public ToolOutput extractInfo(File file) throws FitsToolException {
+		if(!osHasTool) {
+			//Tool cannot be used on this system
+			return null;
+		}
 		List<String> execCommand = new ArrayList<String>();
 		if (osIsWindows) {
 			//use provided Windows File Utility
 			execCommand.addAll(WIN_COMMAND);
-			execCommand.add("-e");
-			execCommand.add("cdf");
-			execCommand.add(file.getPath());
-		}
-		else if(osHasTool) {
+		} else {
 			//use file command in operating system
 			execCommand.addAll(UNIX_COMMAND);
-			execCommand.add("-e");
-			execCommand.add("cdf");
-			execCommand.add(file.getPath());
 		}
-		else {
-			//Tool cannot be used on this system
-			return null;
-		}
+		execCommand.add("-b"); // omit file name in output
+		execCommand.add("-e"); // exclude specified test
+		execCommand.add("cdf"); //  details of Compound Document Files
+		execCommand.add(file.getPath());
 
-		execCommand.add("-b");		
 		String execOut = CommandLine.exec(execCommand,null);
 		if(execOut != null && execOut.length() > 0) {
 			execOut = execOut.trim();
@@ -110,7 +106,7 @@ public class FileUtility extends ToolBase {
 			execOut = "";
 		}
 		
-		execCommand.add("--mime");
+		execCommand.add(1, "--mime"); // options must come before file path
 		String execMimeOut = CommandLine.exec(execCommand,null);
 		if(execMimeOut != null && execMimeOut.length() > 0) {
 			execMimeOut = execMimeOut.trim();
