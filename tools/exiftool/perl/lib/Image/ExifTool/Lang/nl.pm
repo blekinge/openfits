@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::nl;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.09';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -29,7 +30,7 @@ $VERSION = '1.02';
    'AELockButton' => {
       Description => 'AE-L/AF-L',
       PrintConv => {
-        'AE Lock Hold' => 'AE-vergrendeling vast',
+        'AE Lock (hold)' => 'AE-vergrendeling vast',
         'AE Lock Only' => 'AE-vergrendeling',
         'AE-L/AF Area' => 'AE-L/AF veld',
         'AE-L/AF-L/AF Area' => 'AE-L/AF-L/AF veld',
@@ -98,7 +99,7 @@ $VERSION = '1.02';
    'AFAreaMode' => {
       Description => 'AF-veldstand',
       PrintConv => {
-        'Auto-area AF' => 'Automatischveld AF',
+        'Auto-area' => 'Automatischveld AF',
         'Dynamic Area' => 'Dynamisch veld',
         'Single Area' => 'Enkelveld',
       },
@@ -116,19 +117,6 @@ $VERSION = '1.02';
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
-      },
-    },
-   'AFAssistIlluminator' => {
-      Description => 'AF-hulpverlichting',
-      PrintConv => {
-        'Off' => 'Uit',
-        'On' => 'Aan',
-      },
-    },
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'Nee',
-        'Yes' => 'Ja',
       },
     },
    'AFPoint' => {
@@ -274,7 +262,7 @@ $VERSION = '1.02';
         'Off' => 'Uit',
       },
     },
-   'Aperture' => 'F waarde',
+   'Aperture' => 'Diafragma',
    'ApertureValue' => 'Diafragma',
    'ApplicationRecordVersion' => 'Gegevensversie',
    'Artist' => 'Maker van de afbeelding',
@@ -315,6 +303,8 @@ $VERSION = '1.02';
         'Text Only' => 'Alleen tekst (geen objectgegevens)',
       },
     },
+   'Author' => 'Auteur',
+   'AuthorsPosition' => 'Positie van de auteur',
    'AutoAperture' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -331,11 +321,6 @@ $VERSION = '1.02';
       },
     },
    'AutoBracketOrder' => 'Bracketingvolgorde',
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Geen',
-      },
-    },
    'AutoBracketSet' => {
       Description => 'Inst. voor auto bracketing',
       PrintConv => {
@@ -351,6 +336,13 @@ $VERSION = '1.02';
       },
     },
    'AutoExposureBracketing' => {
+      PrintConv => {
+        'Off' => 'Uit',
+        'On' => 'Aan',
+      },
+    },
+   'AutoFP' => {
+      Description => 'Auto FP',
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
@@ -396,7 +388,7 @@ $VERSION = '1.02';
         'Rotate 180' => '180° (onder/rechts)',
         'Rotate 270 CW' => 'Draai 270° met de klok mee',
         'Rotate 90 CW' => '90° tegen de klok in (rechts/boven)',
-        'Unknown' => 'Onbekend',
+        'n/a' => 'Onbekend',
       },
     },
    'BWMode' => {
@@ -454,6 +446,7 @@ $VERSION = '1.02';
         '2/3 EV' => '2/3 stop',
       },
     },
+   'Brightness' => 'Helderheid',
    'BrightnessValue' => 'Helderheid',
    'BurstMode' => {
       PrintConv => {
@@ -476,10 +469,10 @@ $VERSION = '1.02';
    'CalibrationIlluminant1' => {
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -489,18 +482,19 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standaard licht A',
         'Standard Light B' => 'Standaard licht B',
         'Standard Light C' => 'Standaard licht C',
-        'Tungsten' => 'Kunstlicht (gloeilamp)',
+        'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'CalibrationIlluminant2' => {
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -510,9 +504,10 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standaard licht A',
         'Standard Light B' => 'Standaard licht B',
         'Standard Light C' => 'Standaard licht C',
-        'Tungsten' => 'Kunstlicht (gloeilamp)',
+        'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'CameraOrientation' => {
@@ -538,6 +533,7 @@ $VERSION = '1.02';
       },
     },
    'Caption-Abstract' => 'Titel/Beschrijving',
+   'CaptionWriter' => 'Schrijver van het onderschrift',
    'CaptureXResolutionUnit' => {
       PrintConv => {
         'um' => 'µm (micrometer)',
@@ -548,6 +544,7 @@ $VERSION = '1.02';
         'um' => 'µm (micrometer)',
       },
     },
+   'Categories' => 'Categorieën',
    'Category' => 'Categorie',
    'CellLength' => 'Cel lengte',
    'CellWidth' => 'Cel breedte',
@@ -564,6 +561,7 @@ $VERSION = '1.02';
         'Average' => 'Gemiddeld',
       },
     },
+   'CharacterSet' => 'Tekenset',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'High' => 'Hoog',
@@ -611,18 +609,30 @@ $VERSION = '1.02';
       },
     },
    'ColorFilter' => {
+      Description => 'Kleurfilter',
       PrintConv => {
         'Off' => 'Uit',
       },
     },
    'ColorMode' => {
+      Description => 'Instellingen',
       PrintConv => {
+        'Autumn Leaves' => 'Herfstbladeren',
+        'B&W' => 'Zwart-wit',
+        'Clear' => 'Doorzichtig',
+        'Deep' => 'Diep',
         'Evening' => 'Avond',
         'Landscape' => 'Landschap',
+        'Light' => 'Licht',
+        'Neutral' => 'Neutraal',
+        'Night View' => 'Nacht',
+        'Night View/Portrait' => 'Nachtportret',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
         'Portrait' => 'Portret',
         'Standard' => 'Standaard',
+        'Sunset' => 'Zonsondergang',
+        'Vivid' => 'Levendige kleuren',
       },
     },
    'ColorMoireReduction' => {
@@ -641,11 +651,13 @@ $VERSION = '1.02';
    'ColorSpace' => {
       Description => 'Kleur ruimte',
       PrintConv => {
+        'ICC Profile' => 'ICC-profiel',
         'Uncalibrated' => 'Niet vastgelegd',
       },
     },
    'ColorSpaceData' => 'Gegevenskleurenruimte',
    'ColorTable' => 'Kleur tabel',
+   'ColorTemperature' => 'Kleurtemperatuur',
    'ColorTone' => {
       PrintConv => {
         'Normal' => 'Normaal',
@@ -686,7 +698,8 @@ $VERSION = '1.02';
         'Yes' => 'Ja',
       },
     },
-   'CommanderChannel' => 'Commanderstand > Kanaal',
+   'CommanderChannel' => 'Commanderstand Kanaal',
+   'CommanderGroupAManualOutput' => 'Commanderstand Groep A M Corrct',
    'CommanderGroupAMode' => {
       Description => 'Commanderstand Groep A Stand',
       PrintConv => {
@@ -695,8 +708,8 @@ $VERSION = '1.02';
         'TTL' => 'DDL',
       },
     },
-   'CommanderGroupA_ManualOutput' => 'Commanderstand Groep A M Corrct',
    'CommanderGroupA_TTL-AAComp' => 'Commanderstand Groep A DDL/AA Corrct',
+   'CommanderGroupBManualOutput' => 'Commanderstand Groep B M Corrct',
    'CommanderGroupBMode' => {
       Description => 'Commanderstand Groep B Stand',
       PrintConv => {
@@ -705,7 +718,6 @@ $VERSION = '1.02';
         'TTL' => 'DDL',
       },
     },
-   'CommanderGroupB_ManualOutput' => 'Commanderstand Groep B M Corrct',
    'CommanderGroupB_TTL-AAComp' => 'Commanderstand Groep B DDL/AA Corrct',
    'CommanderInternalFlash' => {
       Description => 'Commanderstand Ingb. flitsr Stand',
@@ -729,7 +741,7 @@ $VERSION = '1.02';
    'Compression' => {
       Description => 'Compressie schema',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF gecomprimeerd',
+        'JPEG' => 'JPEG-compressie',
         'JPEG (old-style)' => 'JPEG (oude versie)',
         'Kodak DCR Compressed' => 'Kodak DCR gcomprimeerd',
         'Kodak KDC Compressed' => 'Kodak KDC gecomprimeerd',
@@ -752,11 +764,6 @@ $VERSION = '1.02';
    'ConnectionSpaceIlluminant' => 'Witpunt van connectiekleurruimte',
    'ContentLocationCode' => 'Locatiecode van inhoud',
    'ContentLocationName' => 'Locatienaam van inhoud',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normaal',
-      },
-    },
    'ContinuousDrive' => {
       PrintConv => {
         'Continuous' => 'Continu',
@@ -782,10 +789,20 @@ $VERSION = '1.02';
         'Unknown' => 'Onbekend',
       },
     },
+   'Country' => 'Land',
    'Country-PrimaryLocationCode' => 'ISO landcode',
    'Country-PrimaryLocationName' => 'Land',
    'CreateDate' => 'Datum van de originele data generatie',
+   'CreationDate' => 'Opname datum',
    'Creator' => 'Maker',
+   'CreatorAddress' => 'Maker - Adres',
+   'CreatorCity' => 'Maker - Plaats',
+   'CreatorCountry' => 'Maker - Land',
+   'CreatorPostalCode' => 'Maker - Postcode',
+   'CreatorRegion' => 'Maker - Provincie',
+   'CreatorWorkEmail' => 'Maker - E-mail',
+   'CreatorWorkTelephone' => 'Maker - Telefoonnummer',
+   'CreatorWorkURL' => 'Maker - Website(s)',
    'Credit' => 'Leverancier',
    'CropActive' => {
       PrintConv => {
@@ -866,6 +883,7 @@ $VERSION = '1.02';
    'DigitalCreationDate' => 'Digitale opnamedatum',
    'DigitalCreationTime' => 'Digitaal opnametijdstip',
    'DigitalZoom' => {
+      Description => 'Digitaal zoomen',
       PrintConv => {
         'None' => 'Geen',
         'Off' => 'Uit',
@@ -878,6 +896,7 @@ $VERSION = '1.02';
       },
     },
    'DigitalZoomRatio' => 'Digitale zoom factor',
+   'Directory' => 'Plaats van het bestand',
    'DisplaySize' => {
       PrintConv => {
         'Normal' => 'Normaal',
@@ -910,16 +929,17 @@ $VERSION = '1.02';
    'DocumentName' => 'Document naam',
    'DocumentNotes' => 'Documentopmerkingen',
    'DriveMode' => {
+      Description => 'Ontspannermodus',
       PrintConv => {
         'Continuous' => 'Continu',
-        'Continuous shooting' => 'Continu',
+        'Continuous Shooting' => 'Continu',
         'Off' => 'Uit',
         'Self-timer' => 'Zelfontspanner',
         'Self-timer Operation' => 'Zelfontspanner',
         'Single' => 'Enkel beeld',
         'Single Frame' => 'Enkel beeld',
         'Single Shot' => 'Enkel beeld',
-        'Single-frame shooting' => 'Enkel beeld',
+        'Single-frame Shooting' => 'Enkel beeld',
       },
     },
    'DynamicAFArea' => {
@@ -943,7 +963,15 @@ $VERSION = '1.02';
       },
     },
    'DynamicRangeOptimizer' => {
+      Description => 'Dyn.-bereikoptim',
       PrintConv => {
+        'Advanced Auto' => 'Geavancrd Auto',
+        'Advanced Lv1' => 'Geavanceerd-1',
+        'Advanced Lv2' => 'Geavanceerd-2',
+        'Advanced Lv3' => 'Geavanceerd-3',
+        'Advanced Lv4' => 'Geavanceerd-4',
+        'Advanced Lv5' => 'Geavanceerd-5',
+        'Auto' => 'Automatisch',
         'Off' => 'Uit',
         'Standard' => 'Standaard',
       },
@@ -1020,6 +1048,7 @@ $VERSION = '1.02';
    'ExifCameraInfo' => 'Exif Camera-informatie',
    'ExifImageHeight' => 'Afbeelding hoogte',
    'ExifImageWidth' => 'Afbeelding breedte',
+   'ExifOffset' => 'Exif IFD-wijzer',
    'ExifToolVersion' => 'ExifTool versie',
    'ExifVersion' => 'Exif versie',
    'ExpandFilm' => 'Breid film uit',
@@ -1030,6 +1059,14 @@ $VERSION = '1.02';
    'ExpandSoftware' => 'Breid software uit',
    'ExpirationDate' => 'Verloopdatum',
    'ExpirationTime' => 'Verlooptijdstip',
+   'ExposureCompStepSize' => {
+      Description => 'Stapgrootte belichtingscorr.',
+      PrintConv => {
+        '1 EV' => '1 stop',
+        '1/2 EV' => '1/2 stop',
+        '1/3 EV' => '1/3 stop',
+      },
+    },
    'ExposureCompensation' => 'Belichtingscorrectie',
    'ExposureControlStepSize' => {
       Description => 'Stapgrootte inst. belichting',
@@ -1117,6 +1154,14 @@ $VERSION = '1.02';
     },
    'ExtraSamples' => 'Extra componenten',
    'FNumber' => 'F waarde',
+   'FaceOrientation' => {
+      PrintConv => {
+        'Horizontal (normal)' => '0° (boven/links)',
+        'Rotate 180' => '180° (onder/rechts)',
+        'Rotate 270 CW' => 'Draai 270° met de klok mee',
+        'Rotate 90 CW' => '90° tegen de klok in (rechts/boven)',
+      },
+    },
    'FastSeek' => {
       PrintConv => {
         'No' => 'Nee',
@@ -1132,6 +1177,8 @@ $VERSION = '1.02';
    'FaxRecvTime' => 'Fax ontvangst tijd',
    'FaxSubAddress' => 'Fax sub adres',
    'FileFormat' => 'Fileformaat',
+   'FileModifyDate' => 'Datum actualisering',
+   'FileName' => 'Bestandnaam',
    'FileNumberMemory' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1145,6 +1192,7 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
+   'FileSize' => 'Bestandgrootte',
    'FileSource' => {
       Description => 'Bestand bron',
       PrintConv => {
@@ -1153,7 +1201,9 @@ $VERSION = '1.02';
         'Reflection Print Scanner' => 'Scanner',
       },
     },
+   'FileType' => 'Bestandtype',
    'FileVersion' => 'Fileformaat versie',
+   'Filename' => 'Bestandnaam',
    'FillOrder' => {
       Description => 'Vul volgorde',
       PrintConv => {
@@ -1182,17 +1232,9 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
-   'FineTuneOptCenterWeighted' => 'Fijnafst. voor opt. belichting > Centrumgericht',
-   'FineTuneOptMatrixMetering' => 'Fijnafst. voor opt. belichting > Matrixmeting',
-   'FineTuneOptSpotMetering' => 'Fijnafst. voor opt. belichting > Spotmeting',
-   'FineTuneStepSize' => {
-      Description => 'Stapgrootte belichtingscorr.',
-      PrintConv => {
-        '1 EV' => '1 stop',
-        '1/2 EV' => '1/2 stop',
-        '1/3 EV' => '1/3 stop',
-      },
-    },
+   'FineTuneOptCenterWeighted' => 'Fijnafst. voor opt. belichting Centrumgericht',
+   'FineTuneOptMatrixMetering' => 'Fijnafst. voor opt. belichting Matrixmeting',
+   'FineTuneOptSpotMetering' => 'Fijnafst. voor opt. belichting Spotmeting',
    'FixtureIdentifier' => 'Kenmerk',
    'Flash' => {
       Description => 'Flits',
@@ -1235,6 +1277,7 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
+   'FlashCompensation' => 'Flitscorrectie',
    'FlashControlMode' => {
       PrintConv => {
         'Manual' => 'Handmatig',
@@ -1248,6 +1291,7 @@ $VERSION = '1.02';
       },
     },
    'FlashEnergy' => 'Flits energie',
+   'FlashExposureComp' => 'Flitscompensatie',
    'FlashExposureLock' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1358,16 +1402,19 @@ $VERSION = '1.02';
       Description => 'Sensor resolutie eenheid',
       PrintConv => {
         'None' => 'Geen',
+        'inches' => 'inch',
         'um' => 'µm (micrometer)',
       },
     },
    'FocalPlaneXResolution' => 'Horizontale sensor resolutie',
    'FocalPlaneYResolution' => 'Verticale sensor resolutie',
    'Focus' => {
+      Description => 'Scherpstelling',
       PrintConv => {
         'Manual' => 'Handmatig',
       },
     },
+   'FocusArea' => 'Scherpstelveld',
    'FocusAreaSelection' => {
       Description => 'Doorloop scherpstelpunt',
       PrintConv => {
@@ -1382,6 +1429,7 @@ $VERSION = '1.02';
       },
     },
    'FocusMode' => {
+      Description => 'Focus modus',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Continuous' => 'Continu',
@@ -1397,6 +1445,9 @@ $VERSION = '1.02';
    'FocusModeSetting' => {
       Description => 'Scherpstelstand',
       PrintConv => {
+        'AF-A' => 'Automatische AF',
+        'AF-C' => 'Continue AF',
+        'AF-S' => 'Enkelvoudige AF',
         'Manual' => 'Handmatig',
       },
     },
@@ -1423,6 +1474,8 @@ $VERSION = '1.02';
         'Short' => 'Kort',
       },
     },
+   'FrameRate' => 'Beeldwisselsnelheid',
+   'FrameSize' => 'Beeldformaat',
    'FreeByteCounts' => 'Aantal bytes van het lege databereik',
    'FreeOffsets' => 'Vrije data posities',
    'FujiFlashMode' => {
@@ -1504,6 +1557,7 @@ $VERSION = '1.02';
         'True North' => 'Geografische uitrichting',
       },
     },
+   'GPSInfo' => 'GPS Info IFD-wijzer',
    'GPSLatitude' => 'Breedte graad',
    'GPSLatitudeRef' => {
       Description => 'Noord. of zuid. breedte',
@@ -1547,6 +1601,7 @@ $VERSION = '1.02';
       Description => 'GPS ontvanger status',
       PrintConv => {
         'Measurement Active' => 'Meting loopt',
+        'Measurement Void' => 'Interoperabiliteit voor metingen',
       },
     },
    'GPSTimeStamp' => 'GPS tijd (atoomklok)',
@@ -1575,6 +1630,7 @@ $VERSION = '1.02';
         'Yes' => 'Ja',
       },
     },
+   'Gradation' => 'Levendig',
    'GrayResponseUnit' => {
       PrintConv => {
         '0.0001' => 'Nummer stelt een 1000ste van een eenheid voor',
@@ -1594,10 +1650,19 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
+   'HDR' => {
+      Description => 'Auto HDR',
+      PrintConv => {
+        'Off' => 'Uit',
+      },
+    },
    'Headline' => 'Opschrift',
    'HeightResolution' => 'Beeldresolutie verticaal',
    'HighISONoiseReduction' => {
+      Description => 'NR bij hoge-ISO',
       PrintConv => {
+        'Auto' => 'Automatisch',
+        'High' => 'Hi',
         'Low' => 'Laag',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
@@ -1617,8 +1682,12 @@ $VERSION = '1.02';
         'Yes' => 'Ja',
       },
     },
+   'Hue' => 'Kleurtoon',
+   'ICCProfile' => 'ICC Profiel',
    'IPTC-NAA' => 'IPTC-NAA metadata',
    'ISO' => 'ISO gevoeligheid',
+   'ISOAuto' => 'ISO auto',
+   'ISODisplay' => 'ISO-weergave',
    'ISOExpansion' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1722,6 +1791,7 @@ $VERSION = '1.02';
         'Yes' => 'Ja',
       },
     },
+   'ImageSize' => 'Beeldformaat',
    'ImageStabilization' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1745,6 +1815,8 @@ $VERSION = '1.02';
         'Medium Magnification' => 'Gemiddelde zoom',
       },
     },
+   'Instructions' => 'Instructies',
+   'IntellectualGenre' => 'Genre',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1777,9 +1849,11 @@ $VERSION = '1.02';
         'THM - DCF thumbnail file' => 'THM: DCF Miniatuur formaat',
       },
     },
+   'InteropOffset' => 'Interoperabiliteit-tag',
    'InteropVersion' => 'Interoperabiliteits versie',
    'JFIFVersion' => 'JFIF versie',
    'JobID' => 'ID van baan',
+   'Keyword' => 'Trefwoorden',
    'Keywords' => 'Trefwoord',
    'LCDIllumination' => {
       Description => 'LCD-verlichting',
@@ -1801,6 +1875,8 @@ $VERSION = '1.02';
       },
     },
    'LanguageIdentifier' => 'Taalherkenning',
+   'Lens' => 'Objectief',
+   'LensInfo' => 'Lensgegevens',
    'LicenseType' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
@@ -1810,10 +1886,10 @@ $VERSION = '1.02';
       Description => 'Lichtbron',
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -1823,9 +1899,10 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standaard licht A',
         'Standard Light B' => 'Standaard licht B',
         'Standard Light C' => 'Standaard licht C',
-        'Tungsten' => 'Kunstlicht (gloeilamp)',
+        'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'LightSourceSpecial' => {
@@ -1834,6 +1911,7 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
+   'Lightness' => 'Helderheid',
    'Lit' => {
       PrintConv => {
         'No' => 'Nee',
@@ -1846,7 +1924,9 @@ $VERSION = '1.02';
         'On' => 'Aan',
       },
     },
+   'Location' => 'Lokatie',
    'LongExposureNoiseReduction' => {
+      Description => 'NR lang-belicht',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Off' => 'Uit',
@@ -1866,7 +1946,8 @@ $VERSION = '1.02';
       },
     },
    'MB-D10Batteries' => 'MB-D10 batterijen',
-   'MB-D80Batteries' => '[32] MB-D80 batterijen',
+   'MB-D10BatteryType' => 'MB-D10 batterijen',
+   'MB-D80Batteries' => 'MB-D80 batterijen',
    'MIEVersion' => 'MIE versie',
    'MSStereo' => {
       PrintConv => {
@@ -1898,6 +1979,8 @@ $VERSION = '1.02';
     },
    'Make' => 'Fabrikant',
    'MakeAndModel' => 'Producent en model',
+   'MakerNote' => 'Fabrikant informatie',
+   'MakerNotes' => 'Wenken van de fabrikant',
    'ManualFlashOutput' => {
       Description => 'Ingebouwde flitser Handmatig Sterkte',
       PrintConv => {
@@ -1905,10 +1988,16 @@ $VERSION = '1.02';
       },
     },
    'MasterDocumentID' => 'ID van hoofddocument',
+   'MaxAperture' => 'Maximale lensopening',
    'MaxApertureValue' => 'Grootste diafragma',
    'MaxContinuousRelease' => 'Max. aant. continuopnamen',
    'MaxSampleValue' => 'Max sample waarde',
    'MediaBlackPoint' => 'Media zwartpunt',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normaal',
+      },
+    },
    'MediaWhitePoint' => 'Media Witpunt',
    'Metering' => {
       Description => 'Lichtmeting',
@@ -1923,6 +2012,7 @@ $VERSION = '1.02';
         'Average' => 'Gemiddeld',
         'Center-weighted average' => 'Centrum gemiddelde',
         'Multi-segment' => 'Multi segment',
+        'Multi-spot' => 'MultiSpot',
         'Other' => 'Andere',
         'Partial' => 'Gedeelte',
         'Unknown' => 'Onbekend',
@@ -1938,7 +2028,12 @@ $VERSION = '1.02';
         'Multi-segment' => 'Multi segment',
       },
     },
-   'MeteringTime' => 'Timers uit Belichtingsmeters',
+   'MeteringTime' => {
+      Description => 'Timers uit Belichtingsmeters',
+      PrintConv => {
+        'No Limit' => 'Altijd aan',
+      },
+    },
    'MinSampleValue' => 'Min sample waarde',
    'MinoltaQuality' => {
       PrintConv => {
@@ -1986,7 +2081,7 @@ $VERSION = '1.02';
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewolkt',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
         'Shade' => 'Schaduw',
@@ -2028,15 +2123,22 @@ $VERSION = '1.02';
         'Off' => 'Uit',
       },
     },
+   'MultiFrameNoiseReduction' => {
+      Description => 'Ruisond. Multi Frame',
+      PrintConv => {
+        'Off' => 'Uit',
+        'On' => 'Aan',
+      },
+    },
    'MultiSelector' => {
-      Description => '[f2] Multi-selector',
+      Description => 'Multi-selector',
       PrintConv => {
         'Do Nothing' => 'Doe niets',
         'Reset Meter-off Delay' => 'Activeer lichtmeter',
       },
     },
    'MultiSelectorPlaybackMode' => {
-      Description => 'Centrale knop multiselector > Weergavestand',
+      Description => 'Centrale knop multiselector Weergavestand',
       PrintConv => {
         'Choose Folder' => 'Map selecteren',
         'Thumbnail On/Off' => 'Miniatuur aan/uit',
@@ -2045,7 +2147,7 @@ $VERSION = '1.02';
       },
     },
    'MultiSelectorShootMode' => {
-      Description => 'Centrale knop multiselector > Opnamestand',
+      Description => 'Centrale knop multiselector Opnamestand',
       PrintConv => {
         'Highlight Active Focus Point' => 'Actieve AF-punt markeren',
         'Not Used' => 'Geen functie',
@@ -2080,6 +2182,7 @@ $VERSION = '1.02';
         'Uncompressed' => 'Niet gecomprimeerd',
       },
     },
+   'NikonImageSize' => 'Beeldformaat',
    'NoMemoryCard' => {
       Description => 'Geen geheugenkaart',
       PrintConv => {
@@ -2097,6 +2200,7 @@ $VERSION = '1.02';
       },
     },
    'NoiseReduction' => {
+      Description => 'Ruisreductie',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Normal' => 'Normaal',
@@ -2259,6 +2363,12 @@ $VERSION = '1.02';
         'Planar' => 'Planar Formaat',
       },
     },
+   'Predictor' => {
+      PrintConv => {
+        'Horizontal differencing' => 'Horizontale differencering',
+        'None' => 'Geen prodictor schema in gebruik',
+      },
+    },
    'PreviewColorSpace' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
@@ -2318,10 +2428,16 @@ $VERSION = '1.02';
    'ProgramVersion' => 'Programmaversie',
    'Province-State' => 'Provincie',
    'Quality' => {
+      Description => 'Beeldkwaliteit',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => 'Extra fijn',
+        'Fine' => 'Fijn',
         'High' => 'Hoog',
         'Low' => 'Laag',
         'Normal' => 'Normaal',
+        'RAW + JPEG' => 'RAW+JPEG',
         'Standard' => 'Standaard',
       },
     },
@@ -2351,13 +2467,8 @@ $VERSION = '1.02';
         'Normal' => 'Normaal',
       },
     },
-   'RawLinear' => {
-      PrintConv => {
-        'No' => 'Nee',
-        'Yes' => 'Ja',
-      },
-    },
    'RecordMode' => {
+      Description => 'Opnamemodus',
       PrintConv => {
         'Aperture Priority' => 'Diafragmaprioriteit',
         'Manual' => 'Handmatig',
@@ -2413,9 +2524,9 @@ $VERSION = '1.02';
         'Saturation' => 'Verzadiging',
       },
     },
-   'RepeatingFlashCount' => 'Stroboscopisch flitsen > Aantal',
+   'RepeatingFlashCount' => 'Stroboscopisch flitsen Aantal',
    'RepeatingFlashOutput' => 'Stroboscopisch flitsen Sterkte',
-   'RepeatingFlashRate' => 'Stroboscopisch flitsen > Freq.',
+   'RepeatingFlashRate' => 'Stroboscopisch flitsen Freq.',
    'ResampleParamsQuality' => {
       PrintConv => {
         'High' => 'Hoog',
@@ -2432,6 +2543,7 @@ $VERSION = '1.02';
       Description => 'Eenheid van de X und Y resolutie',
       PrintConv => {
         'None' => 'Geen',
+        'cm' => 'centimeter',
       },
     },
    'RetouchHistory' => {
@@ -2465,11 +2577,11 @@ $VERSION = '1.02';
    'SampleFormat' => {
       Description => 'Sample Formaat',
       PrintConv => {
-        'Complex integer' => 'Complexe integer',
-        'IEEE floating point' => 'Drijvende komma waarde',
-        'Two\'s complement signed integer' => 'Integer met voorteken',
+        'Complex int' => 'Complexe integer',
+        'Float' => 'Drijvende komma waarde',
+        'Signed' => 'Integer met voorteken',
         'Undefined' => 'Niet gedefinierd',
-        'Unsigned integer' => 'Integer zonder voorteken',
+        'Unsigned' => 'Integer zonder voorteken',
       },
     },
    'SamplesPerPixel' => 'Aantal van de componenten',
@@ -2497,16 +2609,27 @@ $VERSION = '1.02';
       },
     },
    'SceneMode' => {
+      Description => 'Scènekeuze',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Anti-bewegingswaas',
         'Aperture Priority' => 'Diafragmaprioriteit',
         'Auto' => 'Automatisch',
+        'Cont. Priority AE' => 'Continuvoork. AE',
+        'Handheld Night Shot' => 'Nachtopname uit hand',
         'Landscape' => 'Landschap',
         'Manual' => 'Handmatig',
+        'Night Portrait' => 'Nachtportret',
+        'Night Scene' => 'Nacht',
+        'Night View/Portrait' => 'Nacht/portret',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
         'Portrait' => 'Portret',
         'Shutter Priority' => 'Sluiterprioriteit',
+        'Sports' => 'Sportactie',
         'Standard' => 'Standaard',
+        'Sunset' => 'Zonsondergang',
+        'Sweep Panorama' => 'Panorama d. beweg.',
       },
     },
    'SceneModeUsed' => {
@@ -2568,6 +2691,7 @@ $VERSION = '1.02';
         'Standard' => 'Standaard',
       },
     },
+   'SerialNumber' => 'Camera-ID',
    'ServiceIdentifier' => 'Service ID',
    'SetButtonCrossKeysFunc' => {
       PrintConv => {
@@ -2575,6 +2699,7 @@ $VERSION = '1.02';
       },
     },
    'ShadingCompensation' => {
+      Description => 'Schaduwcompensatie',
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
@@ -2595,6 +2720,7 @@ $VERSION = '1.02';
    'Sharpness' => {
       Description => 'Scherpte',
       PrintConv => {
+        'Hard' => '+',
         'Normal' => 'Normaal',
         'Soft' => 'Zacht',
       },
@@ -2675,6 +2801,7 @@ $VERSION = '1.02';
         'Off' => 'Uit',
       },
     },
+   'Software' => 'Gebruikte software',
    'Source' => 'Bron',
    'SpatialFrequencyResponse' => 'Spatial frequency response',
    'SpecialEffectsOpticalFilter' => {
@@ -2684,6 +2811,7 @@ $VERSION = '1.02';
     },
    'SpecialInstructions' => 'Instructies',
    'SpectralSensitivity' => 'Spectrale gevoeligheid',
+   'State' => 'Staat',
    'StripByteCounts' => 'Aantal bytes per gecomprimeerd afbeelding deel',
    'StripOffsets' => 'Positie van afbeelding data',
    'Sub-location' => 'Locatie',
@@ -2694,6 +2822,8 @@ $VERSION = '1.02';
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 seconden',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 seconden',
    'SubfileType' => 'Nieuw subbestand type',
+   'Subject' => 'Onderwerp',
+   'SubjectArea' => 'Positie hoofdobject',
    'SubjectDistance' => 'Object afstand',
    'SubjectDistanceRange' => {
       Description => 'Objectief afstandsbereik',
@@ -2775,6 +2905,7 @@ $VERSION = '1.02';
       },
     },
    'ThumbnailImage' => 'Miniatuur',
+   'ThumbnailImageSize' => 'Thumbnail formaat',
    'TimeCreated' => 'Opnametijdstip',
    'TimeScaleParamsQuality' => {
       PrintConv => {
@@ -2793,6 +2924,7 @@ $VERSION = '1.02';
         'White Balance' => 'Witbalans',
       },
     },
+   'Title' => 'Titel',
    'ToneCurve' => {
       PrintConv => {
         'Manual' => 'Handmatig',
@@ -2828,6 +2960,7 @@ $VERSION = '1.02';
         'Rotate 90 CW' => '90° tegen de klok in (rechts/boven)',
       },
     },
+   'TransmissionReference' => 'Transmissiereferentie',
    'Trapped' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
@@ -2842,6 +2975,7 @@ $VERSION = '1.02';
     },
    'UniqueDocumentID' => 'Uniek foto ID',
    'UniqueObjectName' => 'Unieke Naam van het Object',
+   'Unknown' => 'Onbekend',
    'UnsharpMask' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -2939,23 +3073,29 @@ $VERSION = '1.02';
     },
    'WCSProfiles' => 'Windows kleursysteemprofiel',
    'WhiteBalance' => {
-      Description => 'Witbalance',
+      Description => 'Witbalans',
       PrintConv => {
         'Auto' => 'Automatisch',
+        'Black & White' => 'Monochroom',
         'Cloudy' => 'Bewolkt',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Color Temperature/Color Filter' => 'Kleurtemperatuur / Kleurfilter',
+        'Cool White Fluorescent' => 'Koelwit TL-licht',
+        'Custom' => 'Eigen instel.',
+        'Custom 1' => 'VOORKEUR 1',
+        'Custom 2' => 'VOORKEUR 2',
+        'Custom 3' => 'VOORKEUR 3',
+        'Custom 4' => 'VOORKEUR 4',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
-        'DaylightFluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
         'Manual' => 'Handmatig',
         'Shade' => 'Schaduw',
-        'Shadow' => 'Schaduw',
         'Tungsten' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
-        'WhiteFluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'WhiteBalance2' => {
@@ -2986,12 +3126,12 @@ $VERSION = '1.02';
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewolkt',
         'Daylight' => 'Daglicht',
-        'DaylightFluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Manual' => 'Handmatig',
         'Shade' => 'Schaduw',
         'Tungsten' => 'Kunstlicht (gloeilamp)',
-        'WhiteFluorescent' => 'Warm wit TL licht',
+        'White Fluorescent' => 'Warm wit TL-licht',
       },
     },
    'WhitePoint' => 'Wit punt chromaticiteit',
@@ -3003,6 +3143,7 @@ $VERSION = '1.02';
     },
    'WidthResolution' => 'Beeldresolutie horizontaal',
    'Writer-Editor' => 'Titel/Beschrijving auteur',
+   'XMP' => 'XMP metadata',
    'XPAuthor' => 'Auteur',
    'XPComment' => 'Kommentaar',
    'XPKeywords' => 'Trefwoorden',
@@ -3021,6 +3162,14 @@ $VERSION = '1.02';
    'YCbCrSubSampling' => 'Subsampling ratio van Y tot C',
    'YPosition' => 'Y positie',
    'YResolution' => 'Vertikale afbeelding resolutie',
+   'ZoneMatching' => {
+      Description => 'Zoneaanpassing',
+      PrintConv => {
+        'High Key' => 'Hi',
+        'ISO Setting Used' => 'Uit',
+        'Low Key' => 'Lo',
+      },
+    },
    'ZoneMatchingOn' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -3045,7 +3194,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

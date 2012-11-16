@@ -54,8 +54,6 @@ sub WritePhotoshop($$$)
     my $start = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $start);
     my $dirEnd = $start + $dirLen;
-    my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
     my $newData = '';
 
     # make a hash of new tag info, keyed on tagID
@@ -106,15 +104,27 @@ sub WritePhotoshop($$$)
             my $nvHash = $exifTool->GetNewValueHash($tagInfo);
             # check to see if we are overwriting this tag
             $value = substr($$dataPt, $pos, $size);
-            if (Image::ExifTool::IsOverwriting($nvHash, $value)) {
+            my $isOverwriting = $exifTool->IsOverwriting($nvHash, $value);
+            # handle special 'new' and 'old' values for IPTCDigest
+            if (not $isOverwriting and $tagInfo eq $iptcDigestInfo) {
+                if (grep /^new$/, @{$$nvHash{DelValue}}) {
+                    $isOverwriting = 1 if $$exifTool{NewIPTCDigest} and
+                                          $$exifTool{NewIPTCDigest} eq $value;
+                }
+                if (grep /^old$/, @{$$nvHash{DelValue}}) {
+                    $isOverwriting = 1 if $$exifTool{OldIPTCDigest} and
+                                          $$exifTool{OldIPTCDigest} eq $value;
+                }
+            }
+            if ($isOverwriting) {
                 $exifTool->VerboseValue("- Photoshop:$$tagInfo{Name}", $value);
                 # handle IPTCDigest specially because we want to write it last
                 # so the new IPTC digest will be known
-                if ($tagID == 0x0425) {
+                if ($tagInfo eq $iptcDigestInfo) {
                     $$newTags{$tagID} = $tagInfo;   # add later
                     $value = undef;
                 } else {
-                    $value = Image::ExifTool::GetNewValues($nvHash);
+                    $value = $exifTool->GetNewValues($nvHash);
                 }
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
@@ -175,14 +185,20 @@ sub WritePhotoshop($$$)
         if ($$newTags{$tagID}) {
             $tagInfo = $$newTags{$tagID};
             my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-            $value = Image::ExifTool::GetNewValues($nvHash);
+            $value = $exifTool->GetNewValues($nvHash);
             # handle new IPTCDigest value specially
-            if ($tagID == 0x0425 and defined $value and $value eq 'new') {
-                $value = $$exifTool{NewIPTCDigest};
+            if ($tagInfo eq $iptcDigestInfo and defined $value) {
+                if ($value eq 'new') {
+                    $value = $$exifTool{NewIPTCDigest};
+                } elsif ($value eq 'old') {
+                    $value = $$exifTool{OldIPTCDigest};
+                }
+                # (we already know we want to create this tag)
+            } else {
+                # don't add this tag unless specified
+                next unless Image::ExifTool::IsCreating($nvHash);
             }
             next unless defined $value;     # next if tag is being deleted
-            # don't add this tag unless specified
-            next unless Image::ExifTool::IsCreating($nvHash);
             $exifTool->VerboseValue("+ Photoshop:$$tagInfo{Name}", $value);
             ++$exifTool->{CHANGED};
         } else {
@@ -237,7 +253,7 @@ default resource name, and applied if no appended name is provided.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

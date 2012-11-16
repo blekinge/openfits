@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::cs;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.06';
 
 %Image::ExifTool::Lang::cs::Translate = (
    'AEMeteringMode' => {
@@ -64,7 +65,7 @@ $VERSION = '1.02';
       },
     },
    'Annotations' => 'Poznámky Photoshop',
-   'Aperture' => 'F hodnota',
+   'Aperture' => 'Clona',
    'ApertureValue' => 'Clona',
    'Artist' => 'Autor',
    'AssistButtonFunction' => {
@@ -72,11 +73,8 @@ $VERSION = '1.02';
         'Normal' => 'Normální',
       },
     },
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Žádná',
-      },
-    },
+   'Author' => 'Autor',
+   'AuthorsPosition' => 'Pozice autora',
    'AutoLightingOptimizer' => {
       PrintConv => {
         'Low' => 'Méně',
@@ -88,7 +86,7 @@ $VERSION = '1.02';
         'Rotate 180' => '180° (dolů/vpravo)',
         'Rotate 270 CW' => '90° po směru HR (vlevo/dolů)',
         'Rotate 90 CW' => '90° ptoti směru HR (vpravo/nahoru)',
-        'Unknown' => 'Neznámý',
+        'n/a' => 'Neznámý',
       },
     },
    'BadFaxLines' => 'Špatné faxové řádky',
@@ -104,7 +102,9 @@ $VERSION = '1.02';
         'None' => 'Žádná',
       },
     },
+   'Brightness' => 'Jas',
    'BrightnessValue' => 'Jas',
+   'By-line' => 'Autor',
    'CFAPattern' => 'CFA matrice',
    'CFAPattern2' => 'CFA matice 2',
    'CFARepeatPatternDim' => 'Velikost berevné matice CFA',
@@ -129,7 +129,7 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
         'Standard Light C' => 'Standardní světlo C',
-        'Tungsten' => 'Zářivka',
+        'Tungsten (Incandescent)' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
       },
@@ -150,7 +150,7 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
         'Standard Light C' => 'Standardní světlo C',
-        'Tungsten' => 'Zářivka',
+        'Tungsten (Incandescent)' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
       },
@@ -170,6 +170,8 @@ $VERSION = '1.02';
         'Shutter speed priority AE' => 'Priorita času',
       },
     },
+   'Caption-Abstract' => 'Popisek',
+   'CaptionWriter' => 'Autor popisku',
    'CaptureXResolutionUnit' => {
       PrintConv => {
         'um' => 'µm (mikrometr)',
@@ -180,6 +182,8 @@ $VERSION = '1.02';
         'um' => 'µm (mikrometr)',
       },
     },
+   'Categories' => 'Kategorie',
+   'Category' => 'Kategorie',
    'CellLength' => 'Délka buňky',
    'CellWidth' => 'Šířka buňky',
    'CenterWeightedAreaSize' => {
@@ -197,7 +201,14 @@ $VERSION = '1.02';
         'Low' => 'Méně',
       },
     },
+   'City' => 'Město',
    'CleanFaxData' => 'Čistá fax data',
+   'ColorEffect' => {
+      PrintConv => {
+        'Sepia' => 'Sépie',
+      },
+    },
+   'ColorFilter' => 'Barevný filtr',
    'ColorMap' => 'Barevná mapa',
    'ColorMode' => {
       PrintConv => {
@@ -215,9 +226,11 @@ $VERSION = '1.02';
    'ColorSpace' => {
       Description => 'Barevný prostor',
       PrintConv => {
+        'ICC Profile' => 'ICC Profil',
         'Uncalibrated' => 'Nekalibrován',
       },
     },
+   'ColorTemperature' => 'Teplota barev',
    'ColorTone' => {
       PrintConv => {
         'Normal' => 'Normální',
@@ -244,7 +257,7 @@ $VERSION = '1.02';
    'Compression' => {
       Description => 'Kompresní algoritmus',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF komprese',
+        'JPEG' => 'JPEG komprese',
         'JPEG (old-style)' => 'JPEG (pův. verze)',
         'Kodak DCR Compressed' => 'Kodak DCR komprese',
         'Kodak KDC Compressed' => 'Kodak KDC komprese',
@@ -265,11 +278,6 @@ $VERSION = '1.02';
       },
     },
    'ConsecutiveBadFaxLines' => 'Sekvence vadných faxových řádků',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normální',
-      },
-    },
    'Contrast' => {
       Description => 'Kontrast',
       PrintConv => {
@@ -284,12 +292,17 @@ $VERSION = '1.02';
       },
     },
    'Copyright' => 'Držitel práv',
+   'CopyrightNotice' => 'Oznámení o autorských právech',
    'CopyrightStatus' => {
       PrintConv => {
         'Unknown' => 'Neznámý',
       },
     },
+   'Country' => 'Země',
+   'Country-PrimaryLocationName' => 'Země',
    'CreateDate' => 'Datum a čas generování digitálních dat',
+   'CreationDate' => 'Datum vytvoření',
+   'Credit' => 'Kredit',
    'CropUnit' => {
       PrintConv => {
         'inches' => 'Palce',
@@ -312,6 +325,7 @@ $VERSION = '1.02';
         'None' => 'Žádná',
       },
     },
+   'DateCreated' => 'Datum vytvoření',
    'DateTime' => 'Datum a čas změny souboru',
    'DateTimeOriginal' => 'Datum a čas vzniku originálních dat',
    'Description' => 'Popis',
@@ -322,11 +336,13 @@ $VERSION = '1.02';
       },
     },
    'DigitalZoom' => {
+      Description => 'Digitální přiblížení',
       PrintConv => {
         'None' => 'Žádná',
       },
     },
    'DigitalZoomRatio' => 'Digitální zoom',
+   'Directory' => 'Umístění souboru',
    'DisplaySize' => {
       PrintConv => {
         'Normal' => 'Normální',
@@ -360,6 +376,7 @@ $VERSION = '1.02';
    'DjVuVersion' => 'DjVu verze',
    'DocumentName' => 'Jméno dokumentu',
    'DotRange' => 'Bodová rozteč',
+   'DriveMode' => 'Režim spouště',
    'ETTLII' => {
       PrintConv => {
         'Average' => 'Průměr',
@@ -381,6 +398,7 @@ $VERSION = '1.02';
     },
    'ExifImageHeight' => 'Výška',
    'ExifImageWidth' => 'Šířka',
+   'ExifOffset' => 'Ukazatel Exif IFD',
    'ExifToolVersion' => 'ExifTool verze',
    'ExifVersion' => 'Exif verze',
    'ExpandFilm' => 'Ext. film',
@@ -418,6 +436,7 @@ $VERSION = '1.02';
         'Action (High speed)' => 'Akční program (ovlivněný čas závěrky)',
         'Aperture Priority' => 'Priorita clony',
         'Aperture-priority AE' => 'Priorita clony',
+        'Bulb' => 'Žárovka',
         'Creative (Slow speed)' => 'Kreativní program (ovlivněná hloubka ostrosti)',
         'Landscape' => 'Krajina',
         'Manual' => 'Manuální',
@@ -431,6 +450,14 @@ $VERSION = '1.02';
    'ExposureTime' => 'Expoziční čas',
    'ExposureTime2' => 'Expoziční čas 2',
    'FNumber' => 'F hodnota',
+   'FaceOrientation' => {
+      PrintConv => {
+        'Horizontal (normal)' => '0° (nahoru/vlevo)',
+        'Rotate 180' => '180° (dolů/vpravo)',
+        'Rotate 270 CW' => '90° po směru HR (vlevo/dolů)',
+        'Rotate 90 CW' => '90° ptoti směru HR (vpravo/nahoru)',
+      },
+    },
    'FaxProfile' => {
       PrintConv => {
         'Unknown' => 'Neznámý',
@@ -439,6 +466,10 @@ $VERSION = '1.02';
    'FaxRecvParams' => 'Parametry příjemce faxu',
    'FaxRecvTime' => 'Čas příjmu faxu',
    'FaxSubAddress' => 'Sub adresa faxu',
+   'FileFormat' => 'Formát',
+   'FileModifyDate' => 'Datum úpravy',
+   'FileName' => 'Jméno',
+   'FileSize' => 'Velikost',
    'FileSource' => {
       Description => 'Zdroj dat',
       PrintConv => {
@@ -447,6 +478,8 @@ $VERSION = '1.02';
         'Reflection Print Scanner' => 'Skener',
       },
     },
+   'FileType' => 'Typ',
+   'Filename' => 'Jméno',
    'FillOrder' => {
       Description => 'Pořadí výplně',
       PrintConv => {
@@ -509,6 +542,7 @@ $VERSION = '1.02';
       },
     },
    'FlashEnergy' => 'Síla záblesku',
+   'FlashExposureComp' => 'Kompenzace blesku',
    'FlashGroupAControlMode' => {
       PrintConv => {
         'Manual' => 'Manuální',
@@ -580,6 +614,7 @@ $VERSION = '1.02';
       },
     },
    'FocusMode' => {
+      Description => 'Ostření',
       PrintConv => {
         'Macro' => 'Makro',
         'Manual' => 'Manuální',
@@ -608,6 +643,8 @@ $VERSION = '1.02';
         'Normal' => 'Normální',
       },
     },
+   'FrameRate' => 'Snímkovací frekvence',
+   'FrameSize' => 'Velikost snímku',
    'FreeByteCounts' => 'Počet volných bytů',
    'FreeOffsets' => 'Volná datová pozice',
    'GIFVersion' => 'GIF verze',
@@ -671,6 +708,7 @@ $VERSION = '1.02';
         'True North' => 'Geografický směr',
       },
     },
+   'GPSInfo' => 'IFD ukazatel v GPS informacích',
    'GPSLatitude' => 'Zeměpisná šířka',
    'GPSLatitudeRef' => {
       Description => 'Severní nebo Jižní šířka',
@@ -714,6 +752,7 @@ $VERSION = '1.02';
       Description => 'Stav GPS přijímače',
       PrintConv => {
         'Measurement Active' => 'Probíhá měření',
+        'Measurement Void' => 'Vzájemné měření',
       },
     },
    'GPSTimeStamp' => 'GPS čas (atomový čas)',
@@ -736,6 +775,7 @@ $VERSION = '1.02';
         'None' => 'Žádná',
       },
     },
+   'Gradation' => 'Pusobivy',
    'GrayResponseCurve' => 'Šedá referenční křivka',
    'GrayResponseUnit' => {
       Description => 'Jednotka odezvy šedé',
@@ -748,6 +788,7 @@ $VERSION = '1.02';
       },
     },
    'HalftoneHints' => 'Půltóny',
+   'Headline' => 'Titulek',
    'HighISONoiseReduction' => {
       PrintConv => {
         'Low' => 'Méně',
@@ -755,6 +796,8 @@ $VERSION = '1.02';
       },
     },
    'HostComputer' => 'Host',
+   'Hue' => 'Odstín',
+   'ICCProfile' => 'ICC-Profil',
    'IPTC-NAA' => 'IPTC-NAA metadata',
    'ISO' => 'Citlivost ISO',
    'ISOSetting' => {
@@ -776,6 +819,7 @@ $VERSION = '1.02';
         'Normal' => 'Normální',
       },
     },
+   'ImageSize' => 'Velikost snímku',
    'ImageSourceData' => 'Zdrojová data obrázku',
    'ImageTone' => {
       PrintConv => {
@@ -785,8 +829,10 @@ $VERSION = '1.02';
     },
    'ImageUniqueID' => 'Jedinečné ID obrázku',
    'ImageWidth' => 'Šířka',
+   'Index' => 'Nápověda',
    'InkNames' => 'Název náplně',
    'InkSet' => 'Inkoustová sada',
+   'Instructions' => 'Pokyny',
    'InternalFlash' => {
       PrintConv => {
         'Fired' => 'Blesk ano',
@@ -802,8 +848,14 @@ $VERSION = '1.02';
         'THM - DCF thumbnail file' => 'THM: DCF thumbnail file',
       },
     },
+   'InteropOffset' => 'Značka součinnosti',
    'InteropVersion' => 'Verze kompatibility',
    'JFIFVersion' => 'JFIF verze',
+   'Keyword' => 'Klíčová slova',
+   'Keywords' => 'Klíčová slova',
+   'LeafData' => 'Leaf data',
+   'Lens' => 'Objektiv',
+   'LensInfo' => 'Informace o optice',
    'LicenseType' => {
       PrintConv => {
         'Unknown' => 'Neznámý',
@@ -826,11 +878,13 @@ $VERSION = '1.02';
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
         'Standard Light C' => 'Standardní světlo C',
-        'Tungsten' => 'Zářivka',
+        'Tungsten (Incandescent)' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
       },
     },
+   'Lightness' => 'Jas',
+   'Location' => 'Lokalita',
    'LoopStyle' => {
       PrintConv => {
         'Normal' => 'Normální',
@@ -856,13 +910,21 @@ $VERSION = '1.02';
       },
     },
    'Make' => 'Výrobce',
+   'MakerNote' => 'Privátní data výrobce',
+   'MakerNotes' => 'Poznámka výrobce',
    'ManualFlashOutput' => {
       PrintConv => {
         'Low' => 'Méně',
       },
     },
+   'MaxAperture' => 'Maximální clona+C1233 objektivu',
    'MaxApertureValue' => 'Max clona objektivu',
    'MaxSampleValue' => 'Max. hodnota vzorku',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normální',
+      },
+    },
    'Metering' => {
       PrintConv => {
         'Spot' => 'Středový bod',
@@ -874,6 +936,7 @@ $VERSION = '1.02';
         'Average' => 'Průměr',
         'Center-weighted average' => 'Zvýrazněný střed',
         'Multi-segment' => 'Multi segment',
+        'Multi-spot' => 'Vícebodové',
         'Other' => 'Jiné',
         'Partial' => 'Blokové',
         'Spot' => 'Středový bod',
@@ -949,6 +1012,7 @@ $VERSION = '1.02';
       },
     },
    'NoiseReduction' => {
+      Description => 'Potlačení šumu',
       PrintConv => {
         'Normal' => 'Normální',
       },
@@ -996,6 +1060,7 @@ $VERSION = '1.02';
         'WhiteIsZero' => 'Bílá je nula',
       },
     },
+   'PhotoshopAnnotations' => 'Poznámky Photoshop',
    'PictureFinish' => {
       PrintConv => {
         'Portrait' => 'Portrét',
@@ -1067,6 +1132,7 @@ $VERSION = '1.02';
         'Portrait' => 'Portrét',
       },
     },
+   'Province-State' => 'Stát/provincie',
    'Quality' => {
       PrintConv => {
         'Low' => 'Méně',
@@ -1087,6 +1153,7 @@ $VERSION = '1.02';
       },
     },
    'RecordMode' => {
+      Description => 'Režim záznamu',
       PrintConv => {
         'Aperture Priority' => 'Priorita clony',
         'Manual' => 'Manuální',
@@ -1114,6 +1181,7 @@ $VERSION = '1.02';
       Description => 'Jednotka X a Y rozlišení',
       PrintConv => {
         'None' => 'Žádná',
+        'cm' => 'Pixely/cm',
         'inches' => 'Palce',
       },
     },
@@ -1141,11 +1209,11 @@ $VERSION = '1.02';
    'SampleFormat' => {
       Description => 'Formát vzorku',
       PrintConv => {
-        'Complex integer' => 'Komplexní číslo',
-        'IEEE floating point' => 'Desetinná čárka',
-        'Two\'s complement signed integer' => 'Záporné číslo',
+        'Complex int' => 'Komplexní číslo',
+        'Float' => 'Desetinná čárka',
+        'Signed' => 'Záporné číslo',
         'Undefined' => 'Nedefinované',
-        'Unsigned integer' => 'Kladné číslo',
+        'Unsigned' => 'Kladné číslo',
       },
     },
    'SamplesPerPixel' => 'Počet složek',
@@ -1175,6 +1243,7 @@ $VERSION = '1.02';
         'Portrait' => 'Portrét',
         'Shutter Priority' => 'Priorita času',
         'Spot' => 'Středový bod',
+        'Sunset' => 'Západ',
       },
     },
    'SceneModeUsed' => {
@@ -1228,11 +1297,13 @@ $VERSION = '1.02';
         'None' => 'Žádná',
       },
     },
+   'SerialNumber' => 'ID fotoaparátu',
    'SetButtonCrossKeysFunc' => {
       PrintConv => {
         'Normal' => 'Normální',
       },
     },
+   'ShadingCompensation' => 'Kompenzace stínování',
    'Sharpness' => {
       Description => 'Doostření',
       PrintConv => {
@@ -1247,6 +1318,7 @@ $VERSION = '1.02';
       },
     },
    'ShootingMode' => {
+      Description => 'Režim focení',
       PrintConv => {
         'Aperture Priority' => 'Priorita clony',
         'Macro' => 'Makro',
@@ -1269,6 +1341,8 @@ $VERSION = '1.02';
         'None' => 'Žádná',
       },
     },
+   'Software' => 'Použitý software',
+   'Source' => 'Zdroj',
    'SpatialFrequencyResponse' => 'Spatial frequency response',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
@@ -1276,6 +1350,7 @@ $VERSION = '1.02';
       },
     },
    'SpectralSensitivity' => 'Spektrální citlivost',
+   'State' => 'Stát',
    'StripByteCounts' => 'Bytů na komprimovanou část',
    'StripOffsets' => 'Pozice obrazových dat',
    'SubSecCreateDate' => 'Datum a čas generování digitálních dat',
@@ -1285,6 +1360,8 @@ $VERSION = '1.02';
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 sekund',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 sekund',
    'SubfileType' => 'Nový typ podsekce',
+   'Subject' => 'Popis',
+   'SubjectArea' => 'Pozice hlavního objektu',
    'SubjectDistance' => 'Vzdálenost objektu',
    'SubjectDistanceRange' => {
       Description => 'Rozsah vzdálenosti objektu',
@@ -1307,6 +1384,7 @@ $VERSION = '1.02';
         'Unknown' => 'Neznámý',
       },
     },
+   'SupplementalCategories' => 'Doplňkové kategorie',
    'T4Options' => 'Plné bity',
    'T6Options' => 'Volby T6',
    'TargetPrinter' => 'Cílová tiskárna',
@@ -1317,6 +1395,7 @@ $VERSION = '1.02';
     },
    'Thresholding' => 'Práh',
    'ThumbnailImage' => 'Náhled',
+   'ThumbnailImageSize' => 'Velkost náhledu',
    'TileByteCounts' => 'Počet bytů prvku',
    'TileLength' => 'Délka prvku',
    'TileOffsets' => 'Offset prvku',
@@ -1326,6 +1405,7 @@ $VERSION = '1.02';
         'Low' => 'Méně',
       },
     },
+   'Title' => 'Název',
    'ToneCurve' => {
       PrintConv => {
         'Manual' => 'Manuální',
@@ -1354,11 +1434,13 @@ $VERSION = '1.02';
         'Rotate 90 CW' => '90° ptoti směru HR (vpravo/nahoru)',
       },
     },
+   'TransmissionReference' => 'Reference přenosu',
    'Trapped' => {
       PrintConv => {
         'Unknown' => 'Neznámý',
       },
     },
+   'Urgency' => 'Naléhavost',
    'UserComment' => 'Komentář',
    'UserDef1PictureStyle' => {
       PrintConv => {
@@ -1395,20 +1477,24 @@ $VERSION = '1.02';
    'WhiteBalance' => {
       Description => 'Vyvážení bílé',
       PrintConv => {
+        'Auto' => 'Automatické vyvážení bílé',
+        'Black & White' => 'Černobílé foto',
         'Cloudy' => 'Zataženo',
+        'Cool White Fluorescent' => 'Chladná bílá fluorescentní',
+        'Custom 1' => 'VLASTNÍ1',
+        'Custom 2' => 'VLASTNÍ2',
+        'Custom 3' => 'VLASTNÍ3',
+        'Custom 4' => 'VLASTNÍ4',
         'Day White Fluorescent' => 'Denní zářivka',
         'Daylight' => 'Denní světlo',
         'Daylight Fluorescent' => 'Denní světlo',
-        'DaylightFluorescent' => 'Denní světlo',
         'Flash' => 'Blesk',
         'Fluorescent' => 'Žárovka',
         'Manual' => 'Manuální',
         'Shade' => 'Stíny',
-        'Shadow' => 'Stíny',
         'Tungsten' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
-        'WhiteFluorescent' => 'Bílá zářivka',
       },
     },
    'WhiteBalanceAdj' => {
@@ -1430,15 +1516,17 @@ $VERSION = '1.02';
       PrintConv => {
         'Cloudy' => 'Zataženo',
         'Daylight' => 'Denní světlo',
-        'DaylightFluorescent' => 'Denní světlo',
+        'Daylight Fluorescent' => 'Denní světlo',
         'Flash' => 'Blesk',
         'Manual' => 'Manuální',
         'Shade' => 'Stíny',
         'Tungsten' => 'Zářivka',
-        'WhiteFluorescent' => 'Bílá zářivka',
+        'White Fluorescent' => 'Bílá zářivka',
       },
     },
    'WhitePoint' => 'Chromatičnost bílého bodu',
+   'Writer-Editor' => 'Autor popisku',
+   'XMP' => 'XMP metadata',
    'XPAuthor' => 'Autor',
    'XPComment' => 'Komentář',
    'XPKeywords' => 'Klíčová slova',
@@ -1475,14 +1563,14 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jens Duttke and Petr Mich&aacute;lek for providing this
+Thanks to Jens Duttke and Petr MichE<aacute>lek for providing this
 translation.
 
 =head1 SEE ALSO

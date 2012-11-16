@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.23';
+$VERSION = '1.35';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -37,6 +37,8 @@ sub ProcessPS($$;$);
         Priority => 0,
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     Creator     => { Priority => 0, Writable => 'string' },
     ImageData   => { Priority => 0 },
@@ -47,6 +49,8 @@ sub ProcessPS($$;$);
         Priority => 0,
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     Pages       => { Priority => 0 },
     Routing     => { Priority => 0, Writable => 'string' }, #2
@@ -87,7 +91,6 @@ sub ProcessPS($$;$);
         Notes => 'extracted with ExtractEmbedded option',
     },
     EmbeddedFileName => {
-        Groups => { 3 => 'Doc#' }, # (for GetAllGroups())
         Notes => q{
             not a real tag ID, but the file name from a BeginDocument statement.
             Extracted with document metadata when ExtractEmbedded option is used
@@ -128,6 +131,15 @@ sub AUTOLOAD
 }
 
 #------------------------------------------------------------------------------
+# Is this a PC system
+# Returns: true for PC systems
+my %isPC = (MSWin32 => 1, os2 => 1, dos => 1, NetWare => 1, symbian => 1, cygwin => 1);
+sub IsPC()
+{
+    return $isPC{$^O};
+}
+
+#------------------------------------------------------------------------------
 # Get image width or height
 # Inputs: 0) value list ref (ImageData, BoundingBox), 1) true to get height
 sub ImageSize($$)
@@ -150,39 +162,37 @@ sub PSErr($$)
 {
     my ($exifTool, $str) = @_;
     # set file type if not done already
-    $exifTool->SetFileType('PS') unless $exifTool->GetValue('FileType');
+    my $ext = $$exifTool{FILE_EXT};
+    $exifTool->SetFileType(($ext and $ext eq 'AI') ? 'AI' : 'PS');
     $exifTool->Warn("PostScript format error ($str)");
     return 1;
 }
 
 #------------------------------------------------------------------------------
-# set $/ according to the current file
+# Return input record separator to use for the specified file
 # Inputs: 0) RAF reference
-# Returns: Original separator or undefined if on error
-sub SetInputRecordSeparator($)
+# Returns: Input record separator or undef on error
+sub GetInputRecordSeparator($)
 {
     my $raf = shift;
-    my $oldsep = $/;
     my $pos = $raf->Tell(); # save current position
-    my $data;
+    my ($data, $sep);
     $raf->Read($data,256) or return undef;
     my ($a, $d) = (999,999);
     $a = pos($data), pos($data) = 0 if $data =~ /\x0a/g;
     $d = pos($data) if $data =~ /\x0d/g;
     my $diff = $a - $d;
     if ($diff eq 1) {
-        $/ = "\x0d\x0a";
+        $sep = "\x0d\x0a";
     } elsif ($diff eq -1) {
-        $/ = "\x0a\x0d";
+        $sep = "\x0a\x0d";
     } elsif ($diff > 0) {
-        $/ = "\x0d";
+        $sep = "\x0d";
     } elsif ($diff < 0) {
-        $/ = "\x0a";
-    } else {
-        return undef;       # error
-    }
+        $sep = "\x0a";
+    } # else error
     $raf->Seek($pos, 0);    # restore original position
-    return $oldsep;
+    return $sep;
 }
 
 #------------------------------------------------------------------------------
@@ -202,10 +212,12 @@ sub DecodeComment($$$;$)
             $raf->ReadLine($buff) or last;
             my $altnl = $/ eq "\x0d" ? "\x0a" : "\x0d";
             if ($buff =~ /$altnl/) {
+                chomp $buff if $/ eq "\x0d\x0a";        # remove DOS newline before splitting
                 # split into separate lines
                 @$lines = split /$altnl/, $buff, -1;
                 # handle case of DOS newline data inside file using Unix newlines
                 @$lines = ( $$lines[0] . $$lines[1] ) if @$lines == 2 and $$lines[1] eq $/;
+                @$lines[-1] .= $/ if $/ eq "\x0d\x0a";  # add back trailing newline
             } else {
                 push @$lines, $buff;
             }
@@ -268,6 +280,41 @@ sub DecodeComment($$$;$)
 }
 
 #------------------------------------------------------------------------------
+# Unescape PostScript string
+# Inputs: 0) string
+# Returns: unescaped string
+sub UnescapePostScript($)
+{
+    my $str = shift;
+    # decode escape sequences in literal strings
+    while ($str =~ /\\(.)/sg) {
+        my $n = pos($str) - 2;
+        my $c = $1;
+        my $r;
+        if ($c =~ /[0-7]/) {
+            # get up to 2 more octal digits
+            $c .= $1 if $str =~ /\G([0-7]{1,2})/g;
+            # convert octal escape code
+            $r = chr(oct($c) & 0xff);
+        } elsif ($c eq "\x0d") {
+            # the string is continued if the line ends with '\'
+            # (also remove "\x0d\x0a")
+            $c .= $1 if $str =~ /\G(\x0a)/g;
+            $r = '';
+        } elsif ($c eq "\x0a") {
+            $r = '';
+        } else {
+            # convert escaped characters
+            ($r = $c) =~ tr/nrtbf/\n\r\t\b\f/;
+        }
+        substr($str, $n, length($c)+1) = $r;
+        # continue search after this character
+        pos($str) = $n + length($r);
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # Extract information from EPS, PS or AI file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) optional tag table ref
 # Returns: 1 if this was a valid PostScript file
@@ -276,7 +323,7 @@ sub ProcessPS($$;$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
     my $embedded = $exifTool->Options('ExtractEmbedded');
-    my ($data, $dos, $endDoc);
+    my ($data, $dos, $endDoc, $fontTable, $comment);
 
     # allow read from data
     $raf = new File::RandomAccess($$dirInfo{DataPt}) unless $raf;
@@ -285,7 +332,7 @@ sub ProcessPS($$;$)
 #
     $raf->Read($data, 4) == 4 or return 0;
     # accept either ASCII or DOS binary postscript file format
-    return 0 unless $data =~ /^(%!PS|%!Ad|\xc5\xd0\xd3\xc6)/;
+    return 0 unless $data =~ /^(%!PS|%!Ad|%!Fo|\xc5\xd0\xd3\xc6)/;
     if ($data =~ /^%!Ad/) {
         # I've seen PS files start with "%!Adobe-PS"...
         return 0 unless $raf->Read($data, 6) == 6 and $data eq "obe-PS";
@@ -299,16 +346,42 @@ sub ProcessPS($$;$)
         {
             return PSErr($exifTool, 'invalid header');
         }
+    } else {
+        # check for PostScript font file (PFA or PFB)
+        my $d2;
+        $data .= $d2 if $raf->Read($d2,12);
+        if ($data =~ /^%!(PS-(AdobeFont-|Bitstream )|FontType1-)/) {
+            $exifTool->SetFileType('PFA');  # PostScript ASCII font file
+            $fontTable = GetTagTable('Image::ExifTool::Font::PSInfo');
+            # PostScript font files may contain an unformatted comments which may
+            # contain useful information, so accumulate these for the Comment tag
+            $comment = 1;
+        }
+        $raf->Seek(-length($data), 1);
     }
 #
 # set the newline type based on the first newline found in the file
 #
-    my $oldsep = SetInputRecordSeparator($raf);
-    $oldsep or return PSErr($exifTool, 'invalid PS data');
+    local $/ = GetInputRecordSeparator($raf);
+    $/ or return PSErr($exifTool, 'invalid PS data');
 
     # set file type (PostScript or EPS)
-    $raf->ReadLine($data) or return 0;
-    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS') unless $exifTool->{VALUE}->{FileType};
+    $raf->ReadLine($data) or $data = '';
+    my $type;
+    if ($data =~ /EPSF/) {
+        $type = 'EPS';
+    } else {
+        # read next line to see if this is an Illustrator file
+        my $line2;
+        my $pos = $raf->Tell();
+        if ($raf->ReadLine($line2) and $line2 =~ /^%%Creator: Adobe Illustrator/) {
+            $type = 'AI';
+        } else {
+            $type = 'PS';
+        }
+        $raf->Seek($pos, 0);
+    }
+    $exifTool->SetFileType($type);
 #
 # extract TIFF information from DOS header
 #
@@ -340,7 +413,7 @@ sub ProcessPS($$;$)
 #
 # parse the postscript
 #
-    my ($buff, $mode, $beginToken, $endToken, $docNum, $subDocNum);
+    my ($buff, $mode, $beginToken, $endToken, $docNum, $subDocNum, $changedNL);
     my (@lines, $altnl);
     if ($/ eq "\x0d") {
         $altnl = "\x0a";
@@ -355,16 +428,31 @@ sub ProcessPS($$;$)
             $raf->ReadLine($data) or last;
             # check for alternate newlines as efficiently as possible
             if ($data =~ /$altnl/) {
-                # split into separate lines
-                @lines = split /$altnl/, $data, -1;
-                $data = shift @lines;
-                if (@lines == 1 and $lines[0] eq $/) {
-                    # handle case of DOS newline data inside file using Unix newlines
-                    $data .= $lines[0];
-                    undef @lines;
+                if (length($data) > 500000 and IsPC()) {
+                    # Windows can't split very long lines due to poor memory handling,
+                    # so re-read the file with the other newline character instead
+                    # (slower but uses less memory)
+                    unless ($changedNL) {
+                        $changedNL = 1;
+                        my $t = $/;
+                        $/ = $altnl;
+                        $altnl = $t;
+                        $raf->Seek(-length($data), 1);
+                        next;
+                    }
+                } else {
+                    # split into separate lines
+                    @lines = split /$altnl/, $data, -1;
+                    $data = shift @lines;
+                    if (@lines == 1 and $lines[0] eq $/) {
+                        # handle case of DOS newline data inside file using Unix newlines
+                        $data .= $lines[0];
+                        undef @lines;
+                    }
                 }
             }
         }
+        undef $changedNL;
         if ($mode) {
             if (not $endToken) {
                 $buff .= $data;
@@ -419,8 +507,7 @@ sub ProcessPS($$;$)
                     $docNum .= '-' . (++$subDocNum);
                 } else {
                     # this is the Nth document
-                    $$exifTool{DOC_COUNT} = ($$exifTool{DOC_COUNT} || 0) + 1;
-                    $docNum = $$exifTool{DOC_COUNT};
+                    $docNum = $$exifTool{DOC_COUNT} + 1;
                 }
                 $subDocNum = 0; # new level, so reset subDocNum
                 next unless $embedded;  # skip over this document
@@ -473,7 +560,6 @@ sub ProcessPS($$;$)
             $inflate or $exifTool->Warn('Error initializing inflate'), last;
             # generate a PS-like file in memory from the compressed data
             my $verbose = $exifTool->Options('Verbose');
-            my $out = $exifTool->Options('TextOut');
             if ($verbose > 1) {
                 $exifTool->VerboseDir('AI12_CompressedData (first 4kB)');
                 $exifTool->VerboseDump(\$data);
@@ -504,6 +590,32 @@ sub ProcessPS($$;$)
             $val =  # add PS header in case it needs one
             ProcessPS($exifTool, { DataPt => \$val });
             last;
+        } elsif ($fontTable) {
+            if (defined $comment) {
+                # extract initial comments from PostScript Font files
+                if ($data =~ /^%\s+(.*?)[\x0d\x0a]/) {
+                    $comment .= "\n" if $comment;
+                    $comment .= $1;
+                    next;
+                } elsif ($data !~ /^%/) {
+                    # stop extracting comments at the first non-comment line
+                    $exifTool->FoundTag('Comment', $comment) if length $comment;
+                    undef $comment;
+                }
+            }
+            if ($data =~ m{^\s*/(\w+)\s*(.*)} and $$fontTable{$1}) {
+                my ($tag, $val) = ($1, $2);
+                if ($val =~ /^\((.*)\)/) {
+                    $val = UnescapePostScript($1);
+                } elsif ($val =~ m{/?(\S+)}) {
+                    $val = $1;
+                }
+                $exifTool->HandleTag($fontTable, $tag, $val);
+            } elsif ($data =~ /^currentdict end/) {
+                # only extract tags from initial FontInfo dict
+                undef $fontTable;
+            }
+            next;
         } else {
             next;
         }
@@ -522,7 +634,6 @@ sub ProcessPS($$;$)
         undef $buff;
         undef $mode;
     }
-    $/ = $oldsep;   # restore original separator
     $mode = 'Document' if $endDoc and not $mode;
     $mode and PSErr($exifTool, "unterminated $mode data");
     return 1;
@@ -557,7 +668,7 @@ This code reads meta information from EPS (Encapsulated PostScript), PS
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

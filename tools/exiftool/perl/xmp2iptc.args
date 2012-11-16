@@ -1,15 +1,18 @@
-#
+#------------------------------------------------------------------------------
 # File:         xmp2iptc.args
 #
 # Description:  Tag name translations for converting from XMP to IPTC
 #
 # Usage:        exiftool -tagsFromFile SRCFILE -@ xmp2iptc.args DSTFILE
 #
+# Requires:     ExifTool version 7.45 or later
+#
 # Revisions:    2005/05/14 - P. Harvey Created
 #               2008/03/04 - PH Changed Location translation and added
 #                            IntellectualGenre and SubjectCode
 #               2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #               2009/01/20 - PH Updated to conform with MWG spec
+#               2009/10/21 - PH Write IPTC:DigitalCreationDate/Time tags
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -17,7 +20,7 @@
 #               http://www.metadataworkinggroup.org/specs/
 #
 # Notes:        Also updates Photoshop:IPTCDigest as per MWG recommendation.
-#
+#------------------------------------------------------------------------------
 -IPTC:By-line < XMP-dc:Creator
 -IPTC:Caption-Abstract < XMP-dc:Description
 -IPTC:CopyrightNotice < XMP-dc:Rights
@@ -41,6 +44,8 @@
 -IPTC:Urgency < XMP-photoshop:Urgency
 -IPTC:Country-PrimaryLocationCode < XMP-iptcCore:CountryCode
 -IPTC:Sub-location < XMP-iptcCore:Location
+-IPTC:DigitalCreationDate < XMP-xmp:CreateDate
+-IPTC:DigitalCreationTime < XMP-xmp:CreateDate
 # these tags are not free-form text, and may need special handling:
 #-IPTC:ObjectAttributeReference < XMP-iptcCore:IntellectualGenre
 #-IPTC:SubjectReference < XMP-iptcCore:SubjectCode

@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::ja;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.19';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -36,6 +37,7 @@ $VERSION = '1.07';
    'AEBXv' => 'AEブラケット 露出補正',
    'AEExposureTime' => 'AE露出時間',
    'AEExtra' => 'AE特別？',
+   'AEInfo' => '自動露出情報',
    'AELock' => {
       Description => 'AEロック',
       PrintConv => {
@@ -137,6 +139,7 @@ $VERSION = '1.07';
       },
     },
    'AFAdjustment' => 'AF微調整',
+   'AFArea' => 'AFエリア',
    'AFAreaHeight' => 'AFエリア高さ',
    'AFAreaHeights' => 'AFエリア高さ',
    'AFAreaIllumination' => {
@@ -150,9 +153,23 @@ $VERSION = '1.07';
    'AFAreaMode' => {
       Description => 'AFエリアモード',
       PrintConv => {
-        'Auto-area AF' => '自動エリアAF',
+        '1-area' => '１点',
+        '1-area (high speed)' => '高速１点',
+        '3-area (center)?' => '３点中央？',
+        '3-area (left)?' => '３点左？',
+        '3-area (right)?' => '３点右？',
+        '5-area' => '５点',
+        'Auto-area' => '自動エリアAF',
         'Dynamic Area' => 'ダイナミックエリア',
+        'Dynamic Area (closest subject)' => 'ダイナミック（重点主題）',
+        'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
+        'Face Detect AF' => '顔優先',
+        'Group Dynamic' => 'グループダイナミック',
+        'Normal?' => 'ノーマル？',
         'Single Area' => 'シングルポイント',
+        'Single Area (wide)' => 'シングルポイント（ワイド）',
+        'Spot Focusing' => 'スポットフォーカス',
+        'Spot Mode On' => 'スポットモードオン',
       },
     },
    'AFAreaModeSetting' => {
@@ -185,13 +202,6 @@ $VERSION = '1.07';
         'Only ext. flash emits' => '外部ストロボのみする',
       },
     },
-   'AFAssistIlluminator' => {
-      Description => '内蔵AFアシストイルミネーター',
-      PrintConv => {
-        'Off' => 'オフ',
-        'On' => 'オン',
-      },
-    },
    'AFDefocus' => 'AFぼけ量',
    'AFDuringLiveView' => {
       Description => 'ライブビュー撮影中のAF',
@@ -202,16 +212,14 @@ $VERSION = '1.07';
         'Quick mode' => 'クイックモード',
       },
     },
+   'AFFineTune' => 'AFファインチューン',
    'AFFineTuneAdj' => 'AFファインチューン',
    'AFImageHeight' => 'AF画像高さ',
    'AFImageWidth' => 'AF画像幅',
+   'AFInfo' => 'AFモード',
+   'AFInfo2' => 'AF情報',
+   'AFInfo2Version' => 'AF情報バージョン',
    'AFIntegrationTime' => 'AF集積時間',
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'いいえ',
-        'Yes' => 'はい',
-      },
-    },
    'AFMicroadjustment' => {
       Description => 'AFマイクロアジャストメント',
       PrintConv => {
@@ -220,13 +228,7 @@ $VERSION = '1.07';
         'Disable' => 'しない',
       },
     },
-   'AFMode' => {
-      Description => 'AFモード',
-      PrintConv => {
-        'Face Detect AF' => '顔優先',
-        'Normal?' => 'ノーマル？',
-      },
-    },
+   'AFMode' => 'AFモード',
    'AFOnAELockButtonSwitch' => {
       Description => 'AF-ON/AEロックボタン入替',
       PrintConv => {
@@ -243,6 +245,8 @@ $VERSION = '1.07';
         'Face Detect' => '顔認識',
         'Left' => '左',
         'Manual AF point selection' => 'マニュアルAFポイント選択',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
         'None' => '無し',
         'None (MF)' => '無し（MF）',
         'Right' => '右',
@@ -260,8 +264,8 @@ $VERSION = '1.07';
       PrintConv => {
         'Disable' => 'しない',
         'Enable' => 'する',
-        'Enable (left/right assist points)' => 'する(左右1領域アシスト有効)',
-        'Enable (surrounding assist points)' => 'する(周囲1領域アシスト有効)',
+        'Left/right AF points' => 'する(左右1領域アシスト有効)',
+        'Surrounding AF points' => 'する(周囲1領域アシスト有効)',
       },
     },
    'AFPointAutoSelection' => {
@@ -321,7 +325,7 @@ $VERSION = '1.07';
         'Automatic Tracking AF' => '自動追尾',
         'Bottom' => '下',
         'Center' => '中央',
-        'Face Recognition AF' => '顔認識',
+        'Face Detect AF' => '顔認識',
         'Fixed Center' => '中央固定',
         'Left' => '左',
         'Lower-left' => '左下',
@@ -405,6 +409,16 @@ $VERSION = '1.07';
         'Auto' => 'オート',
       },
     },
+   'AFPointsUsed' => {
+      Description => 'AF測距点',
+      PrintConv => {
+        'Bottom' => '下',
+        'Center' => '中央',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
+        'Top' => '上',
+      },
+    },
    'AFPredictor' => 'AF予測',
    'AFResponse' => 'AFレスポンス',
    'AFResult' => 'AF結果',
@@ -442,10 +456,14 @@ $VERSION = '1.07';
    'APEVersion' => 'APEバージョン',
    'ARMIdentifier' => 'ARM識別子',
    'ARMVersion' => 'ARMバージョン',
+   'AToB0' => 'AからB0',
+   'AToB1' => 'AからB1',
+   'AToB2' => 'AからB2',
    'AccessoryType' => 'アクセサリータイプ',
    'ActionAdvised' => '動作推奨',
    'ActiveArea' => 'アクティブ領域',
    'ActiveD-Lighting' => {
+      Description => 'アクティブDライティング',
       PrintConv => {
         'High' => '高い',
         'Low' => 'ソフト',
@@ -493,6 +511,7 @@ $VERSION = '1.07';
         'Auto' => 'インテリジェントオート',
       },
     },
+   'Album' => 'アルバム',
    'AlphaByteCount' => 'アルファバイト数',
    'AlphaDataDiscard' => {
       Description => 'アルファデータ破棄',
@@ -515,7 +534,7 @@ $VERSION = '1.07';
       },
     },
    'AntiAliasStrength' => 'カメラのアンチエイリアスフィルタの相対的な強度',
-   'Aperture' => 'F値',
+   'Aperture' => '絞り',
    'ApertureRange' => {
       Description => '絞り数値の制御範囲の設定',
       PrintConv => {
@@ -577,6 +596,8 @@ $VERSION = '1.07';
    'AudioSamplingRate' => 'オーディオサンプリングレート',
    'AudioSamplingResolution' => 'オーディオサンプリング解像度',
    'AudioType' => 'オーディオタイプ',
+   'Author' => '作者',
+   'AuthorsPosition' => '役職名',
    'AutoAperture' => {
       Description => '自動絞り',
       PrintConv => {
@@ -595,14 +616,6 @@ $VERSION = '1.07';
       },
     },
    'AutoBracketOrder' => 'ブラケット順',
-   'AutoBracketRelease' => {
-      Description => 'オートブラケットレリーズ',
-      PrintConv => {
-        'Auto Release' => 'オートレリーズ',
-        'Manual Release' => 'マニュアルレリーズ',
-        'None' => '無し',
-      },
-    },
    'AutoBracketSet' => {
       Description => 'オートブラケット設定',
       PrintConv => {
@@ -684,7 +697,7 @@ $VERSION = '1.07';
         'Rotate 180' => '180度回転',
         'Rotate 270 CW' => '270度回転 CW',
         'Rotate 90 CW' => '90度回転 CW',
-        'Unknown' => 'ソフトウェアで回転',
+        'n/a' => 'ソフトウェアで回転',
       },
     },
    'AuxiliaryLens' => '補助レンズ',
@@ -696,6 +709,9 @@ $VERSION = '1.07';
         'Enable' => '可',
       },
     },
+   'BToA0' => 'BからA0',
+   'BToA1' => 'BからA1',
+   'BToA2' => 'BからA2',
    'BWFilter' => '白黒フィルター',
    'BWMode' => {
       Description => '白黒モード',
@@ -724,10 +740,7 @@ $VERSION = '1.07';
    'BaselineExposure' => 'ベースライン露出',
    'BaselineNoise' => 'ベースラインノイズ',
    'BaselineSharpness' => 'ベースラインシャープネス',
-   'BatteryADBodyLoad' => '電源A/D本体起動時',
-   'BatteryADBodyNoLoad' => '電源A/D本体オフ時',
-   'BatteryADGripLoad' => '電源A/Dグリップ起動時',
-   'BatteryADGripNoLoad' => '電源A/Dグリップオフ時',
+   'BatteryInfo' => '電源',
    'BatteryLevel' => 'バッテリーレベル',
    'BatteryOrder' => {
       Description => 'バッテリー順',
@@ -736,7 +749,6 @@ $VERSION = '1.07';
         'MB-D10 First' => 'MB-D10のバッテリーを最初に使う',
       },
     },
-   'BatteryStates' => '電源状態',
    'BayerGreenSplit' => 'ベイヤーグリーン分割',
    'Beep' => {
       Description => 'ビープ',
@@ -748,7 +760,12 @@ $VERSION = '1.07';
       },
     },
    'BestQualityScale' => '高品質スケール',
-   'BestShotMode' => 'ベストショットモード',
+   'BestShotMode' => {
+      Description => 'ベストショットモード',
+      PrintConv => {
+        'Off' => 'オフ',
+      },
+    },
    'BitDepth' => 'ビット深度',
    'BitsPerComponent' => 'コンポーネントあたりビット',
    'BitsPerExtendedRunLength' => '拡張ランレングスあたりのビット',
@@ -770,6 +787,9 @@ $VERSION = '1.07';
         'None' => '無し',
       },
     },
+   'BodyBatteryADLoad' => '電源A/D本体起動時',
+   'BodyBatteryADNoLoad' => '電源A/D本体オフ時',
+   'BodyBatteryState' => '電源状態本体',
    'BodyFirmwareVersion' => '本体ファームウェアバージョン',
    'BracketMode' => {
       Description => 'ブラケットモード',
@@ -794,6 +814,7 @@ $VERSION = '1.07';
     },
    'BracketValue' => 'ブラケット値',
    'Brightness' => 'ブライトネス',
+   'BrightnessData' => 'ブライトネスデータ',
    'BrightnessValue' => 'ブライトネス',
    'BulbDuration' => 'バルブ時間',
    'BurstMode' => {
@@ -860,8 +881,9 @@ $VERSION = '1.07';
         'Standard Light A' => '標準ライトA',
         'Standard Light B' => '標準ライトB',
         'Standard Light C' => '標準ライトC',
-        'Tungsten' => 'タングステン(白熱灯)',
+        'Tungsten (Incandescent)' => 'タングステン(白熱灯)',
         'Unknown' => '不明',
+        'Warm White Fluorescent' => '暖白光色蛍光灯',
         'White Fluorescent' => '温白色蛍光灯',
       },
     },
@@ -882,15 +904,18 @@ $VERSION = '1.07';
         'Standard Light A' => '標準ライトA',
         'Standard Light B' => '標準ライトB',
         'Standard Light C' => '標準ライトC',
-        'Tungsten' => 'タングステン(白熱灯)',
+        'Tungsten (Incandescent)' => 'タングステン(白熱灯)',
         'Unknown' => '不明',
+        'Warm White Fluorescent' => '暖白光色蛍光灯',
         'White Fluorescent' => '温白色蛍光灯',
       },
     },
    'CameraCalibration1' => 'カメラキャリブレーション1',
    'CameraCalibration2' => 'カメラキャリブレーション2',
    'CameraCalibrationSig' => 'カメラキャリブレーションサイン',
+   'CameraID' => 'カメラID',
    'CameraISO' => 'カメラISO',
+   'CameraInfo' => 'ペンタックスモデル',
    'CameraOrientation' => {
       Description => '画像の向き',
       PrintConv => {
@@ -899,7 +924,9 @@ $VERSION = '1.07';
         'Rotate 90 CW' => '90度回転 CW',
       },
     },
+   'CameraParameters' => 'カメラパラメーター',
    'CameraSerialNumber' => 'カメラシリアル番号',
+   'CameraSettings' => 'カメラ設定',
    'CameraSettingsVersion' => 'カメラ設定バージョン',
    'CameraTemperature' => 'カメラ温度',
    'CameraType' => {
@@ -912,6 +939,8 @@ $VERSION = '1.07';
       },
     },
    'CameraType2' => 'カメラタイプ2',
+   'CanonAFInfo' => 'AF情報',
+   'CanonAFInfo2' => 'AF情報2',
    'CanonExposureMode' => {
       Description => '露出モード',
       PrintConv => {
@@ -924,6 +953,7 @@ $VERSION = '1.07';
         'Shutter speed priority AE' => 'シャッター優先',
       },
     },
+   'CanonFileInfo' => 'ファイル情報',
    'CanonFileLength' => 'ファイル長',
    'CanonFirmwareVersion' => 'ファームウェアバージョン',
    'CanonFlashMode' => {
@@ -939,6 +969,7 @@ $VERSION = '1.07';
         'Slow-sync' => 'スローシンクロ',
       },
     },
+   'CanonFocalLength' => 'フォーカスタイプ',
    'CanonImageHeight' => '画像高さ',
    'CanonImageSize' => {
       Description => 'イメージサイズ',
@@ -951,6 +982,9 @@ $VERSION = '1.07';
         'Medium Movie' => 'ミディアム動画',
         'Postcard' => 'ハガキ',
         'Small' => 'スモール',
+        'Small 1' => 'スモール1',
+        'Small 2' => 'スモール2',
+        'Small 3' => 'スモール3',
         'Small Movie' => 'スモール動画',
         'Widescreen' => 'ワイド画面',
       },
@@ -959,7 +993,9 @@ $VERSION = '1.07';
    'CanonImageWidth' => '画像幅',
    'CanonModelID' => 'モデルID',
    'Caption-Abstract' => '表題/説明',
+   'CaptionWriter' => 'キャプション作成者',
    'CasioImageSize' => 'カシオイメージサイズ',
+   'Categories' => 'カテゴリー',
    'Category' => 'カテゴリー',
    'CellLength' => 'セル長',
    'CellWidth' => 'セル幅',
@@ -977,8 +1013,10 @@ $VERSION = '1.07';
       },
     },
    'CharTarget' => '目的文字',
+   'CharacterSet' => 'キャラクターセット',
    'ChromaBlurRadius' => '彩度ぼけ半径',
    'ChromaticAdaptation' => '色彩順応化',
+   'Chromaticity' => '色度',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'High' => '高い',
@@ -1013,7 +1051,7 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
-   'ColorBalance1' => 'カラーバランス1',
+   'ColorBalance' => 'カラーバランス',
    'ColorBalanceAdj' => {
       Description => 'カラーバランス調整',
       PrintConv => {
@@ -1024,6 +1062,8 @@ $VERSION = '1.07';
    'ColorBalanceBlue' => 'カラーバランス青',
    'ColorBalanceGreen' => 'カラーバランス緑',
    'ColorBalanceRed' => 'カラーバランス赤',
+   'ColorBoostData' => 'カラーブーストデータ',
+   'ColorBoostLevel' => 'カラーブーストレベル1',
    'ColorBoostType' => {
       Description => 'カラーブーストタイプ',
       PrintConv => {
@@ -1058,6 +1098,7 @@ $VERSION = '1.07';
         'Blue' => '青',
         'Green' => '緑',
         'Off' => 'オフ',
+        'Pink' => 'ピンク',
         'Purple' => '紫',
         'Red' => '赤',
         'Sepia' => 'セピア',
@@ -1066,6 +1107,7 @@ $VERSION = '1.07';
     },
    'ColorGain' => 'カラーゲイン',
    'ColorHue' => '色相',
+   'ColorInfo' => '色情報',
    'ColorMap' => 'カラーマップ',
    'ColorMatrix' => 'カラーマトリックス',
    'ColorMatrix1' => 'カラーマトリックス1',
@@ -1074,22 +1116,26 @@ $VERSION = '1.07';
    'ColorMode' => {
       Description => 'カラーモード',
       PrintConv => {
+        'Adobe RGB' => '夕日',
         'Autumn Leaves' => '紅葉',
         'B & W' => '白黒',
         'B&W' => '白黒',
         'Black & White' => '白黒',
-        'Black&white' => '白黒',
         'Chrome' => 'クローム',
         'Clear' => 'クリアー',
         'Deep' => 'ディープ',
+        'Evening' => '夕焼け',
         'Landscape' => '風景',
         'Light' => 'ライト',
         'Natural' => 'ナチュラル',
         'Natural color' => 'ナチュラルカラー',
+        'Natural sRGB' => 'ナチュラル sRGB',
+        'Natural+ sRGB' => 'ナチュラル+ sRGB',
         'Neutral' => 'ニュートラル',
         'Night Portrait' => '人物夜景',
         'Night Scene' => '夜景',
         'Night View' => 'ナイトビュー',
+        'Night View/Portrait' => '夜景/夜景ポートレート',
         'Normal' => 'ノーマル',
         'Off' => 'オフ',
         'Portrait' => 'ポートレート',
@@ -1130,6 +1176,7 @@ $VERSION = '1.07';
    'ColorSpace' => {
       Description => '色空間',
       PrintConv => {
+        'ICC Profile' => 'ICCプロフィール',
         'Monochrome' => 'モノトーン',
         'Uncalibrated' => '未調整',
       },
@@ -1152,6 +1199,7 @@ $VERSION = '1.07';
    'ColorToneUserDef2' => 'カラートーンユーザ設定2',
    'ColorToneUserDef3' => 'カラートーンユーザ設定3',
    'ColorantOrder' => '着色順',
+   'ColorantTable' => '着色テーブル',
    'ColorimetricReference' => '比色分析参照',
    'CommandDials' => {
       Description => 'コマンダーダイヤル',
@@ -1188,24 +1236,26 @@ $VERSION = '1.07';
         'Yes' => 'はい',
       },
     },
-   'CommanderChannel' => 'コマンダーモード > チャンネル',
+   'CommanderChannel' => 'コマンダーモード チャンネル',
+   'CommanderGroupAManualOutput' => 'コマンダーモード グループA M 補正',
    'CommanderGroupAMode' => {
       Description => 'コマンダーモード グループA モード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
       },
     },
-   'CommanderGroupA_ManualOutput' => 'コマンダーモード グループA M 補正',
    'CommanderGroupA_TTL-AAComp' => 'コマンダーモード 内蔵フラッシュ TTL/AA 補正',
+   'CommanderGroupBManualOutput' => 'コマンダーモード グループB M 補正',
    'CommanderGroupBMode' => {
       Description => 'コマンダーモード グループB モード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
       },
     },
-   'CommanderGroupB_ManualOutput' => 'コマンダーモード グループB M 補正',
    'CommanderGroupB_TTL-AAComp' => 'コマンダーモード グループB TTL/AA 補正',
    'CommanderInternalFlash' => {
       Description => 'コマンダーモード 内蔵フラッシュ モード',
@@ -1229,6 +1279,7 @@ $VERSION = '1.07';
    'Compression' => {
       Description => '圧縮計画',
       PrintConv => {
+        'JPEG' => 'JPEG圧縮率',
         'JPEG (old-style)' => 'JPEG(古い形式)',
         'None' => '無し',
         'Uncompressed' => '非圧縮',
@@ -1246,12 +1297,6 @@ $VERSION = '1.07';
    'Contact' => '連絡',
    'ContentLocationCode' => '内容位置コード',
    'ContentLocationName' => '内容位置名',
-   'ContentType' => {
-      PrintConv => {
-        'Movie' => '動画',
-        'Normal' => '標準',
-      },
-    },
    'ContinuousDrive' => {
       Description => 'ドライブモード',
       PrintConv => {
@@ -1330,10 +1375,21 @@ $VERSION = '1.07';
     },
    'CoringFilter' => 'コアリングフィルタ',
    'CoringValues' => 'コアリング値',
+   'Country' => '国名',
    'Country-PrimaryLocationCode' => 'ISO国コード',
    'Country-PrimaryLocationName' => '国',
    'CreateDate' => 'デジタルデータ作成日時',
+   'CreationDate' => '作成日時',
+   'CreativeStyle' => 'クリエイティブスタイル',
    'Creator' => '製作者',
+   'CreatorAddress' => 'クリエーター　-　住所',
+   'CreatorCity' => 'クリエーター　-　街',
+   'CreatorCountry' => 'クリエーター　-　国',
+   'CreatorPostalCode' => 'クリエーター　-　郵便番号',
+   'CreatorRegion' => 'クリエーター　-　国/州',
+   'CreatorWorkEmail' => 'クリエーター　-　電子メール',
+   'CreatorWorkTelephone' => 'クリエーター　-　電話番号',
+   'CreatorWorkURL' => 'クリエーター　-　WEBサイト',
    'Credit' => 'プロバイダー',
    'CropActive' => {
       PrintConv => {
@@ -1341,6 +1397,7 @@ $VERSION = '1.07';
         'Yes' => 'はい',
       },
     },
+   'CropData' => 'クロップデータ',
    'CropHeight' => '最終高さ',
    'CropHiSpeed' => 'ハイスピードクロップ',
    'CropLeft' => '開始オフセットX',
@@ -1355,6 +1412,10 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'Custom1' => 'カスタム1',
+   'Custom2' => 'カスタム2',
+   'Custom3' => 'カスタム3',
+   'Custom4' => 'カスタム4',
    'CustomRendered' => {
       Description => 'カスタム画像処理',
       PrintConv => {
@@ -1370,12 +1431,16 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'D-LightingHQColorBoost' => 'DライティングHQカラーブースト',
+   'D-LightingHQHighlight' => 'DライティングHQハイライト',
    'D-LightingHQSelected' => {
+      Description => 'DライティングHQ選択',
       PrintConv => {
         'No' => 'いいえ',
         'Yes' => 'はい',
       },
     },
+   'D-LightingHQShadow' => 'DライティングHQシャドウ',
    'D-LightingHS' => {
       Description => 'DライティングHS',
       PrintConv => {
@@ -1383,6 +1448,8 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'D-LightingHSAdjustment' => 'DライティングHS調整',
+   'D-LightingHSColorBoost' => 'DライティングHSカラーブースト',
    'DECPosition' => {
       Description => 'DEC位置',
       PrintConv => {
@@ -1464,7 +1531,9 @@ $VERSION = '1.07';
     },
    'DigitalCreationDate' => 'デジタル作成日付',
    'DigitalCreationTime' => 'デジタル作成時間',
+   'DigitalGEM' => 'デジタルGEM',
    'DigitalICE' => 'デジタルICE',
+   'DigitalROC' => 'デジタルROC',
    'DigitalZoom' => {
       Description => 'デジタルズーム',
       PrintConv => {
@@ -1481,7 +1550,9 @@ $VERSION = '1.07';
       },
     },
    'DigitalZoomRatio' => 'デジタルズーム比率',
+   'Directory' => 'ファイルの場所',
    'DirectoryIndex' => 'ディレクトリ索引',
+   'DirectoryNumber' => 'ディレクトリ番号',
    'DisplayAperture' => '絞り表示',
    'DisplaySize' => {
       PrintConv => {
@@ -1489,6 +1560,7 @@ $VERSION = '1.07';
       },
     },
    'DistortionCorrection' => {
+      Description => '歪曲修正',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -1512,8 +1584,8 @@ $VERSION = '1.07';
         'Bracketing' => 'ブラケット',
         'Burst' => '高速連射',
         'Continuous' => '連続撮影',
-        'Continuous (Hi)' => '連射 (Hi)',
-        'Continuous shooting' => '連続撮影',
+        'Continuous High' => '連射 (Hi)',
+        'Continuous Shooting' => '連続撮影',
         'HS continuous' => 'HS連写',
         'Interval' => 'インターバル',
         'Multiple Exposure' => '複数の露出',
@@ -1531,7 +1603,7 @@ $VERSION = '1.07';
         'Single Frame' => '１コマ撮影',
         'Single Shot' => '１コマ撮影',
         'Single-frame' => '1コマ撮影',
-        'Single-frame shooting' => '１コマ撮影',
+        'Single-frame Shooting' => '１コマ撮影',
         'UHS continuous' => 'UHS連写',
       },
     },
@@ -1573,6 +1645,7 @@ $VERSION = '1.07';
         'Advanced Lv3' => 'アドバンスLv3',
         'Advanced Lv4' => 'アドバンスLv4',
         'Advanced Lv5' => 'アドバンスLv5',
+        'Auto' => 'オート',
         'Off' => 'オフ',
         'Standard' => 'スタンダード',
       },
@@ -1591,6 +1664,7 @@ $VERSION = '1.07';
         'Evaluative' => '評価',
       },
     },
+   'EVStepInfo' => 'EVステップ情報',
    'EVStepSize' => {
       Description => 'EVステップ',
       PrintConv => {
@@ -1602,9 +1676,7 @@ $VERSION = '1.07';
       Description => '露出ステップ',
       PrintConv => {
         '1/2 EV Steps' => '1/2 EVステップ',
-        '1/2 EV steps' => '1/2 EVステップ',
         '1/3 EV Steps' => '1/3 EVステップ',
-        '1/3 EV steps' => '1/3 EVステップ',
       },
     },
    'EasyExposureCompensation' => {
@@ -1640,6 +1712,7 @@ $VERSION = '1.07';
         'My Colors' => 'ワンポイントカラー',
         'Neutral' => 'ニュートラル',
         'Night' => '夜景',
+        'Night Scene' => '夜景',
         'Night Snapshot' => 'ナイトスナップ',
         'Pan focus' => 'パンフォーカス',
         'Portrait' => 'ポートレート',
@@ -1648,6 +1721,7 @@ $VERSION = '1.07';
         'Snow' => 'スノー',
         'Sports' => 'スポーツ',
         'Still Image' => '静止画像',
+        'Sunset' => '夕焼け',
         'Super Macro' => 'スーパーマクロ',
         'Underwater' => '水中',
         'Vivid' => 'ビビッド',
@@ -1708,11 +1782,13 @@ $VERSION = '1.07';
    'EpsonImageHeight' => 'エプソン画像高',
    'EpsonImageWidth' => 'エプソン画像幅',
    'EpsonSoftware' => 'エプソンソフトウェア',
+   'Equipment' => 'イクイップメントIFDポインター',
    'EquipmentVersion' => 'イクイップメントバージョン',
    'ExcursionTolerance' => '振幅許容範囲',
    'ExifCameraInfo' => 'Exifカメラ情報',
    'ExifImageHeight' => '画像高さ',
    'ExifImageWidth' => '画像幅',
+   'ExifOffset' => 'Exif IFDへのポインタ',
    'ExifToolVersion' => 'ExifToolバージョン',
    'ExifVersion' => 'Exifバージョン',
    'ExpandFilm' => '拡張フイルム',
@@ -1723,8 +1799,17 @@ $VERSION = '1.07';
    'ExpandSoftware' => '拡張ソフト',
    'ExpirationDate' => '有効日付',
    'ExpirationTime' => '有効時間',
+   'Exposure' => '露出',
    'ExposureBracketStepSize' => '露出ブラケットステップサイズ',
    'ExposureBracketValue' => '露出ブラケット値',
+   'ExposureCompStepSize' => {
+      Description => '露出補正/ファインチューン',
+      PrintConv => {
+        '1 EV' => '1ステップ',
+        '1/2 EV' => '1/2ステップ',
+        '1/3 EV' => '1/3ステップ',
+      },
+    },
    'ExposureCompensation' => '露出補正値',
    'ExposureControlStepSize' => {
       Description => '露出制御のEVステップ',
@@ -1763,12 +1848,14 @@ $VERSION = '1.07';
         'Bulb' => 'バルブ',
         'Landscape' => '風景',
         'Manual' => 'マニュアル露出',
-        'Night Scene' => '夜景',
+        'Night Scene / Twilight' => '夜景',
         'Portrait' => 'ポートレート',
         'Program' => 'プログラム',
+        'Program AE' => 'プログラムAE',
         'Program-shift' => 'プログラムシフト',
         'Shutter Priority' => 'シャッター優先',
         'Shutter speed priority AE' => 'シャッター優先',
+        'n/a' => '未設定',
       },
     },
    'ExposureModeInManual' => {
@@ -1787,6 +1874,7 @@ $VERSION = '1.07';
         'Action (High speed)' => 'スポーツモード(高速シャッター優先)',
         'Aperture Priority' => '絞り優先',
         'Aperture-priority AE' => '絞り優先',
+        'Bulb' => 'バルブ',
         'Creative (Slow speed)' => 'クリエイティブプログラム(被写界深度優先)',
         'Landscape' => '風景モード',
         'Manual' => 'マニュアル',
@@ -1847,6 +1935,7 @@ $VERSION = '1.07';
         'n/a (Manual Mode)' => '未設定（マニュアルモード）',
       },
     },
+   'ExternalFlashFlags' => '外付フラッシュフラグ',
    'ExternalFlashGuideNumber' => '外付フラッシュガイドナンバー？',
    'ExternalFlashMode' => {
       Description => '外付フラッシュモード',
@@ -1875,6 +1964,7 @@ $VERSION = '1.07';
    'Face6Position' => '顔6位置',
    'Face7Position' => '顔7位置',
    'Face8Position' => '顔8位置',
+   'Face9Position' => '顔9位置',
    'FaceDetect' => {
       Description => '顔認識',
       PrintConv => {
@@ -1883,8 +1973,15 @@ $VERSION = '1.07';
       },
     },
    'FaceDetectArea' => '顔エリア',
-   'FaceDetectFrameHeight' => 'フレーム高',
-   'FaceDetectFrameWidth' => 'フレーム幅',
+   'FaceDetectFrameSize' => 'フレームサイズ',
+   'FaceOrientation' => {
+      PrintConv => {
+        'Horizontal (normal)' => '水平（標準）',
+        'Rotate 180' => '180度回転',
+        'Rotate 270 CW' => '270度回転 CW',
+        'Rotate 90 CW' => '90度回転 CW',
+      },
+    },
    'FacesDetected' => '顔認識',
    'FastSeek' => {
       PrintConv => {
@@ -1902,6 +1999,9 @@ $VERSION = '1.07';
    'FaxSubAddress' => 'FAXサブアドレス',
    'FileFormat' => 'ファイル形式',
    'FileIndex' => 'ファイル索引',
+   'FileInfo' => 'ファイル情報',
+   'FileInfoVersion' => 'ファイル情報バージョン',
+   'FileModifyDate' => '更新日時',
    'FileName' => 'ファイル名',
    'FileNumber' => 'ファイル番号',
    'FileNumberMemory' => {
@@ -1929,6 +2029,7 @@ $VERSION = '1.07';
     },
    'FileType' => 'ファイルタイプ',
    'FileVersion' => 'ファイル形式バージョン',
+   'Filename' => 'ファイル名',
    'FillFlashAutoReduction' => {
       Description => '日中シンクロ・ストロボ露出自動低減制御',
       PrintConv => {
@@ -1990,17 +2091,9 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
-   'FineTuneOptCenterWeighted' => '最適露出微調整 > 中央重点測光',
-   'FineTuneOptMatrixMetering' => '最適露出微調整 > 分割測光',
-   'FineTuneOptSpotMetering' => '最適露出微調整 > スポット測光',
-   'FineTuneStepSize' => {
-      Description => '露出補正/ファインチューン',
-      PrintConv => {
-        '1 EV' => '1ステップ',
-        '1/2 EV' => '1/2ステップ',
-        '1/3 EV' => '1/3ステップ',
-      },
-    },
+   'FineTuneOptCenterWeighted' => '最適露出微調整 中央重点測光',
+   'FineTuneOptMatrixMetering' => '最適露出微調整 分割測光',
+   'FineTuneOptSpotMetering' => '最適露出微調整 スポット測光',
    'Firmware' => 'ファームウェア',
    'FirmwareDate' => 'ファームウェア日付',
    'FirmwareRevision' => 'ファームウェアリビジョン',
@@ -2046,14 +2139,17 @@ $VERSION = '1.07';
    'FlashBits' => 'フラッシュ詳細',
    'FlashChargeLevel' => 'フラッシュチャージレベル',
    'FlashCommanderMode' => {
+      Description => 'コマンダーモード',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
+   'FlashCompensation' => 'フラッシュ補正',
    'FlashControlMode' => {
       Description => 'フラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
@@ -2094,31 +2190,43 @@ $VERSION = '1.07';
       },
     },
    'FlashFirmwareVersion' => 'フラッシュファームウェアバージョン',
+   'FlashFocalLength' => 'フラッシュ焦点距離',
+   'FlashGroupACompensation' => 'グループAフラッシュ補正',
    'FlashGroupAControlMode' => {
       Description => 'グループAフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupAOutput' => 'グループAフラッシュ出力',
+   'FlashGroupBCompensation' => 'グループBフラッシュ補正',
    'FlashGroupBControlMode' => {
       Description => 'グループBフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupBOutput' => 'グループBフラッシュ出力',
+   'FlashGroupCCompensation' => 'グループCフラッシュ補正',
    'FlashGroupCControlMode' => {
       Description => 'グループCフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupCOutput' => 'グループCフラッシュ出力',
    'FlashGuideNumber' => 'フラッシュガイドナンバー',
+   'FlashInfo' => 'ストロボ情報',
+   'FlashInfoVersion' => 'フラッシュ情報バージョン',
    'FlashIntensity' => {
       Description => 'フラッシュ強度',
       PrintConv => {
@@ -2212,6 +2320,7 @@ $VERSION = '1.07';
       },
     },
    'FlashOutput' => 'フラッシュ出力',
+   'FlashRemoteControl' => 'フラッシュリモートコントロール',
    'FlashSerialNumber' => 'フラッシュシリアル番号',
    'FlashSetting' => 'フラッシュ設定',
    'FlashShutterSpeed' => 'フラッシュシャッター速度',
@@ -2273,6 +2382,7 @@ $VERSION = '1.07';
       Description => '焦点面解像度単位',
       PrintConv => {
         'None' => '無し',
+        'inches' => 'インチ',
       },
     },
    'FocalPlaneXResolution' => '焦点面X解像度',
@@ -2290,6 +2400,7 @@ $VERSION = '1.07';
     },
    'FocalUnits' => '焦点単位/mm',
    'Focus' => {
+      Description => 'フォーカス',
       PrintConv => {
         'Manual' => 'マニュアル',
       },
@@ -2319,6 +2430,8 @@ $VERSION = '1.07';
         'AI Focus AF' => 'AIフォーカスAF',
         'AI Servo AF' => 'AIサーボAF',
         'Auto' => 'オート',
+        'Auto, Continuous' => 'オート、コンティニュアス',
+        'Auto, Focus button' => 'オート、フォーカスボタン',
         'Continuous' => '連写',
         'Continuous AF' => 'コンティニュアスAF',
         'Custom' => 'カスタム',
@@ -2327,8 +2440,8 @@ $VERSION = '1.07';
         'Macro (1)' => 'マクロ(1)',
         'Macro (2)' => 'マクロ(2)',
         'Manual' => 'マニュアル',
-        'Manual Focus (3)' => 'マニュアルフォーカス',
-        'Manual Focus (6)' => 'マニュアルフォーカス',
+        'Manual Focus (3)' => 'マニュアルフォーカス(3)',
+        'Manual Focus (6)' => 'マニュアルフォーカス(6)',
         'Multi AF' => 'マルチAF',
         'Normal' => '標準',
         'One-shot AF' => 'ワンショットAF',
@@ -2339,12 +2452,7 @@ $VERSION = '1.07';
         'Super Macro' => 'スーパーマクロ',
       },
     },
-   'FocusMode2' => {
-      Description => 'フォーカスモード2',
-      PrintConv => {
-        'Manual' => 'マニュアル',
-      },
-    },
+   'FocusMode2' => 'フォーカスモード2',
    'FocusModeSetting' => {
       Description => 'フォーカスモード',
       PrintConv => {
@@ -2408,7 +2516,11 @@ $VERSION = '1.07';
    'FolderName' => 'フォルダ名',
    'ForwardMatrix1' => '前行列1',
    'ForwardMatrix2' => '前行列2',
+   'FrameHeight' => 'フレーム高',
    'FrameNumber' => 'フレーム番号',
+   'FrameRate' => 'フレームレート',
+   'FrameSize' => 'フレームサイズ',
+   'FrameWidth' => 'フレーム幅',
    'FreeByteCounts' => 'フリーバイト数',
    'FreeMemoryCardImages' => 'フリーメモリーカードイメージ',
    'FreeOffsets' => 'フリーオフセット',
@@ -2436,6 +2548,8 @@ $VERSION = '1.07';
         'Spot Metering' => 'スポット測光',
       },
     },
+   'GEMInfo' => 'GEM情報',
+   'GEModel' => 'モデル',
    'GIFVersion' => 'GIFバージョン',
    'GPSAltitude' => '高度',
    'GPSAltitudeRef' => {
@@ -2497,6 +2611,7 @@ $VERSION = '1.07';
         'True North' => '本当の方向',
       },
     },
+   'GPSInfo' => 'GPS IFDへのポインタ',
    'GPSLatitude' => '緯度',
    'GPSLatitudeRef' => {
       Description => '北緯または南緯',
@@ -2577,6 +2692,7 @@ $VERSION = '1.07';
    'GeoTiffDirectory' => 'ジオキーディレクトリタグ',
    'GeoTiffDoubleParams' => 'ジオダブル設定タグ',
    'Gradation' => 'グラデーション',
+   'GrayPoint' => 'グレーポイント',
    'GrayResponseCurve' => 'グレー反応曲線',
    'GrayResponseUnit' => {
       Description => 'グレー反応単位',
@@ -2588,6 +2704,7 @@ $VERSION = '1.07';
         '1e-06' => '単位の数は100-1000を表す',
       },
     },
+   'GrayScale' => 'グレースケール',
    'GrayTRC' => '灰色調増殖曲線',
    'GreenMatrixColumn' => '緑色マトリックス列',
    'GreenTRC' => '緑色調増殖曲線',
@@ -2598,14 +2715,23 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'GripBatteryADLoad' => '電源A/Dグリップ起動時',
+   'GripBatteryADNoLoad' => '電源A/Dグリップオフ時',
+   'GripBatteryState' => '電源状態グリップ',
    'HCUsage' => 'HC使用',
+   'HDR' => {
+      Description => 'オートHDR',
+      PrintConv => {
+        'Off' => '切',
+      },
+    },
    'HalftoneHints' => 'ハーフトーンヒント',
    'Headline' => 'ヘッドライン',
    'HeightResolution' => '高さ方向の画像解像度',
    'HighISONoiseReduction' => {
       Description => '高感度ノイズリダクション',
       PrintConv => {
-        'Disable' => 'しない',
+        'Auto' => 'オート',
         'High' => '高い',
         'Low' => 'ソフト',
         'Minimal' => '最小',
@@ -2638,11 +2764,14 @@ $VERSION = '1.07';
       },
     },
    'HostComputer' => 'ホストコンピューター',
+   'Hue' => '色相',
    'HueAdjustment' => '色相調整',
    'HueSetting' => '色相設定',
+   'ICCProfile' => 'ICCプロフィール',
    'ICC_Profile' => 'ICC入力色プロフィール',
    'IPTC-NAA' => 'IPTC-NAAメタデータ',
    'IPTCBitsPerSample' => 'サンプルあたりビット数',
+   'IPTCData' => 'IPTCデータ',
    'IPTCImageHeight' => 'ライン数',
    'IPTCImageRotation' => 'イメージ回転',
    'IPTCImageWidth' => 'ラインあたりのピクセル数',
@@ -2651,6 +2780,8 @@ $VERSION = '1.07';
    'IPTCPixelWidth' => 'スキャン方向ピクセルサイズ',
    'ISO' => 'ISOスピードレート',
    'ISO2' => 'ISO（2）',
+   'ISOAuto' => 'ISOオート',
+   'ISODisplay' => 'ISO表示',
    'ISOExpansion' => {
       Description => 'ISO感度拡張',
       PrintConv => {
@@ -2659,11 +2790,13 @@ $VERSION = '1.07';
       },
     },
    'ISOExpansion2' => {
+      Description => 'ISO拡大（2）',
       PrintConv => {
         'Off' => 'オフ',
       },
     },
    'ISOFloor' => '最低感度',
+   'ISOInfo' => 'ISO情報',
    'ISOSelection' => 'ISO選択',
    'ISOSetting' => {
       Description => 'ISO設定',
@@ -2743,9 +2876,20 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'ImageEditCount' => '画像処理カウント',
+   'ImageEditing' => {
+      Description => 'イメージ処理',
+      PrintConv => {
+        'Cropped' => 'クロップ',
+        'Digital Filter' => 'デジタルフィルター',
+        'Frame Synthesis?' => 'フレーム合成？',
+        'None' => '未処理',
+      },
+    },
    'ImageHeight' => '画像高さ',
    'ImageHistory' => '画像履歴',
    'ImageID' => 'イメージID',
+   'ImageInfo' => '画像情報',
    'ImageLayer' => 'イメージレイヤー',
    'ImageNumber' => 'イメージ番号',
    'ImageNumber2' => 'イメージ番号(2)',
@@ -2759,17 +2903,7 @@ $VERSION = '1.07';
         'Square' => '正方形',
       },
     },
-   'ImageProcessing' => {
-      Description => 'イメージ処理',
-      PrintConv => {
-        'Color Filter' => 'カラーフィルター',
-        'Cropped' => 'クロップ',
-        'Digital Filter' => 'デジタルフィルター',
-        'Frame Synthesis?' => 'フレーム合成？',
-        'Unprocessed' => '未処理',
-      },
-    },
-   'ImageProcessingCount' => '画像処理カウント',
+   'ImageProcessing' => 'イメージ処理',
    'ImageProcessingVersion' => '画像処理バージョン',
    'ImageQuality' => {
       Description => '画像品質',
@@ -2780,6 +2914,7 @@ $VERSION = '1.07';
       },
     },
    'ImageQuality2' => 'イメージ品質2',
+   'ImageResourceBlocks' => 'イメージリソースブロック',
    'ImageReview' => {
       Description => '画像評価',
       PrintConv => {
@@ -2820,8 +2955,8 @@ $VERSION = '1.07';
    'ImageType' => 'ページ',
    'ImageUniqueID' => 'ユニークなイメージID',
    'ImageWidth' => '画像幅',
+   'Index' => '目次',
    'Indexed' => 'インデックス',
-   'InfinityLensStep' => '無限レンズステップ',
    'InfoButtonWhenShooting' => {
       Description => '撮影時のINFOボタン',
       PrintConv => {
@@ -2839,6 +2974,9 @@ $VERSION = '1.07';
     },
    'InkNames' => 'インク名',
    'InkSet' => 'インクセット',
+   'Instructions' => '詳細',
+   'IntellectualGenre' => 'インテリジャンル',
+   'IntelligentAuto' => 'インテリジェントオート',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -2866,25 +3004,25 @@ $VERSION = '1.07';
    'InternalFlashMode' => {
       Description => '内蔵ストロボモード',
       PrintConv => {
-        'Off, (Unknown 0xf4)' => 'オフ（未確認 0xF4?）',
-        'Off, Auto' => 'オフ、オート',
-        'Off, Auto, Red-eye reduction' => 'オフ、オート、赤目軽減',
-        'Off, Normal' => 'オフ、標準',
-        'Off, Red-eye reduction' => 'オフ、赤目軽減',
-        'Off, Slow-sync' => 'オフ、スローシンクロ',
-        'Off, Slow-sync, Red-eye reduction' => 'オフ、スローシンクロ、赤目軽減',
-        'Off, Trailing-curtain Sync' => 'オフ、後幕シンクロ',
-        'Off, Wireless (Control)' => 'オフ、ワイヤレス（コントロール発光）',
-        'Off, Wireless (Master)' => 'オフ、ワイヤレス（マスター発光）',
-        'On' => 'オン',
-        'On, Auto' => 'オン、オート',
-        'On, Auto, Red-eye reduction' => 'オン、オート、赤目軽減',
-        'On, Red-eye reduction' => 'オン、赤目軽減',
-        'On, Slow-sync' => 'オン、スローシンクロ',
-        'On, Slow-sync, Red-eye reduction' => 'オン、スローシンクロ、赤目軽減',
-        'On, Trailing-curtain Sync' => 'オン、後幕シンクロ',
-        'On, Wireless (Control)' => 'オン、ワイヤレス（コントロール発光）',
-        'On, Wireless (Master)' => 'オン、ワイヤレス（マスター発光）',
+        'Did not fire, (Unknown 0xf4)' => 'オフ（未確認 0xF4?）',
+        'Did not fire, Auto' => 'オフ、オート',
+        'Did not fire, Auto, Red-eye reduction' => 'オフ、オート、赤目軽減',
+        'Did not fire, Normal' => 'オフ、標準',
+        'Did not fire, Red-eye reduction' => 'オフ、赤目軽減',
+        'Did not fire, Slow-sync' => 'オフ、スローシンクロ',
+        'Did not fire, Slow-sync, Red-eye reduction' => 'オフ、スローシンクロ、赤目軽減',
+        'Did not fire, Trailing-curtain Sync' => 'オフ、後幕シンクロ',
+        'Did not fire, Wireless (Control)' => 'オフ、ワイヤレス（コントロール発光）',
+        'Did not fire, Wireless (Master)' => 'オフ、ワイヤレス（マスター発光）',
+        'Fired' => 'オン',
+        'Fired, Auto' => 'オン、オート',
+        'Fired, Auto, Red-eye reduction' => 'オン、オート、赤目軽減',
+        'Fired, Red-eye reduction' => 'オン、赤目軽減',
+        'Fired, Slow-sync' => 'オン、スローシンクロ',
+        'Fired, Slow-sync, Red-eye reduction' => 'オン、スローシンクロ、赤目軽減',
+        'Fired, Trailing-curtain Sync' => 'オン、後幕シンクロ',
+        'Fired, Wireless (Control)' => 'オン、ワイヤレス（コントロール発光）',
+        'Fired, Wireless (Master)' => 'オン、ワイヤレス（マスター発光）',
         'n/a - Off-Auto-Aperture' => '該当なし-自動絞りオフ',
       },
     },
@@ -2899,6 +3037,7 @@ $VERSION = '1.07';
         'THM - DCF thumbnail file' => 'THM: DCFサムネイルファイル',
       },
     },
+   'InteropOffset' => '互換性IFDへのポインタ',
    'InteropVersion' => 'インターオペラビリティバージョン',
    'IntervalLength' => 'インターバル長',
    'IntervalMode' => 'インターバルモード',
@@ -2915,6 +3054,7 @@ $VERSION = '1.07';
    'JPEGTables' => 'JPEGテーブル',
    'JobID' => 'ジョブID',
    'JpgRecordedPixels' => 'JPEG記録サイズ',
+   'Keyword' => 'キーワード',
    'Keywords' => 'キーワード',
    'LC1' => 'レンズデータ',
    'LC10' => 'Mv\' nv\' データ',
@@ -2966,6 +3106,7 @@ $VERSION = '1.07';
     },
    'LanguageIdentifier' => '言語識別子',
    'LastFileNumber' => '最終ファイル番号',
+   'LeafData' => 'リーフデータ',
    'Lens' => 'レンズ',
    'Lens35efl' => 'レンズ',
    'LensAFStopButton' => {
@@ -2983,6 +3124,7 @@ $VERSION = '1.07';
       },
     },
    'LensApertureRange' => 'レンズ絞り範囲',
+   'LensData' => 'K値(LC3)',
    'LensDistortionParams' => 'レンズ歪曲パラメータ',
    'LensDriveNoAF' => {
       Description => 'AF測距不能時のレンズ動作',
@@ -2993,6 +3135,8 @@ $VERSION = '1.07';
     },
    'LensFStops' => 'レンズF値',
    'LensFirmwareVersion' => 'レンズファームウェアバージョン',
+   'LensID' => 'レンズID',
+   'LensInfo' => 'レンズ情報',
    'LensKind' => 'レンズ種類/バージョン(LC0)',
    'LensProperties' => 'レンズ機能？',
    'LensSerialNumber' => 'レンズシリアル番号',
@@ -3011,6 +3155,7 @@ $VERSION = '1.07';
       PrintConv => {
         'Cloudy' => '曇り',
         'Cool White Fluorescent' => '白色蛍光灯',
+        'Custom 1-4' => 'カスタム1-4',
         'Day White Fluorescent' => '昼白色蛍光灯',
         'Daylight' => '昼光',
         'Daylight Fluorescent' => '昼光色蛍光灯',
@@ -3023,8 +3168,9 @@ $VERSION = '1.07';
         'Standard Light A' => '標準ライトA',
         'Standard Light B' => '標準ライトB',
         'Standard Light C' => '標準ライトC',
-        'Tungsten' => 'タングステン(白熱灯)',
+        'Tungsten (Incandescent)' => 'タングステン(白熱灯)',
         'Unknown' => '不明',
+        'Warm White Fluorescent' => '暖白光色蛍光灯',
         'White Fluorescent' => '温白色蛍光灯',
       },
     },
@@ -3035,6 +3181,7 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'Lightness' => '明度',
    'LinearResponseLimit' => '線型反応限界',
    'LinearizationTable' => '線形化テーブル',
    'Lit' => {
@@ -3057,11 +3204,12 @@ $VERSION = '1.07';
       },
     },
    'LocalizedCameraModel' => '限定カメラモデル',
+   'Location' => '撮影場所',
    'LockMicrophoneButton' => {
       Description => 'プロテクト/録音ボタン タンの機能',
       PrintConv => {
-        'Protect (holding:sound rec.)' => 'プロテクト(長押しで録音)',
-        'Sound rec. (protect:disable)' => '録音(プロテクト不可)',
+        'Protect (hold:record memo)' => 'プロテクト(長押しで録音)',
+        'Record memo (protect:disable)' => '録音(プロテクト不可)',
       },
     },
    'LongExposureNoiseReduction' => {
@@ -3070,9 +3218,9 @@ $VERSION = '1.07';
         'Auto' => 'オート',
         'Off' => 'オフ',
         'On' => 'オン',
+        'n/a' => '未設定',
       },
     },
-   'LongFocal' => '最長焦点',
    'LookupTable' => 'ルックアップテーブル',
    'LoopStyle' => {
       PrintConv => {
@@ -3088,7 +3236,8 @@ $VERSION = '1.07';
       },
     },
    'MB-D10Batteries' => 'MB-D10電源タイプ',
-   'MB-D80Batteries' => '[32] MB-D80バッテリー',
+   'MB-D10BatteryType' => 'MB-D10電源タイプ',
+   'MB-D80Batteries' => 'MB-D80バッテリー',
    'MIEVersion' => 'MIEバージョン',
    'MIMEType' => 'MIMEタイプ',
    'MSStereo' => {
@@ -3106,6 +3255,7 @@ $VERSION = '1.07';
         'Off' => 'オフ',
         'On' => 'オン',
         'Super Macro' => 'スーパーマクロ',
+        'n/a' => '未設定',
       },
     },
    'MacroMode' => {
@@ -3135,6 +3285,7 @@ $VERSION = '1.07';
     },
    'Make' => 'メーカー',
    'MakeAndModel' => '作成とモデル',
+   'MakerNote' => 'DNGプライベートデータ',
    'MakerNoteOffset' => 'メーカーノートオフセット',
    'MakerNoteSafety' => {
       Description => 'メーカーノートセーフティ',
@@ -3145,6 +3296,7 @@ $VERSION = '1.07';
     },
    'MakerNoteType' => 'メーカーノートタイプ',
    'MakerNoteVersion' => 'メーカーノートバージョン',
+   'MakerNotes' => 'メーカーノート',
    'ManometerPressure' => '気圧計圧力',
    'ManometerReading' => '気圧計高度',
    'ManualFlash' => 'マニュアルフラッシュ',
@@ -3178,13 +3330,21 @@ $VERSION = '1.07';
    'MaxSampleValue' => '最大サンプル値',
    'MaximumDensityRange' => '最大密度範囲',
    'MeasuredEV' => '計測EV',
+   'Measurement' => '測定オブザーバー',
    'MeasurementBacking' => 'バック測定',
    'MeasurementFlare' => 'フレア測定',
    'MeasurementGeometry' => '幾何学測定',
    'MeasurementIlluminant' => '光源測定',
    'MeasurementObserver' => '測定オブザーバー',
    'MediaBlackPoint' => 'メディア黒点',
+   'MediaType' => {
+      PrintConv => {
+        'Movie' => '動画',
+        'Normal' => '標準',
+      },
+    },
    'MediaWhitePoint' => 'メディア白点',
+   'Medium' => 'ミドル',
    'MenuButtonDisplayPosition' => {
       Description => 'メニューの表示位置',
       PrintConv => {
@@ -3242,6 +3402,8 @@ $VERSION = '1.07';
    'MinFocalLength' => '最小焦点距離',
    'MinSampleValue' => '最小サンプル値',
    'MinoltaCameraSettings2' => 'カメラ設定2',
+   'MinoltaCameraSettings5D' => 'カメラ設定(5D)',
+   'MinoltaCameraSettings7D' => 'カメラ設定(7D)',
    'MinoltaDate' => '日付',
    'MinoltaImageSize' => {
       Description => 'イメージサイズ',
@@ -3252,15 +3414,18 @@ $VERSION = '1.07';
         'Small' => 'スモール',
       },
     },
+   'MinoltaMakerNote' => 'ミノルタメーカーノート',
    'MinoltaModelID' => 'モデルID',
    'MinoltaQuality' => {
       Description => 'イメージ品質',
       PrintConv => {
         'Economy' => 'エコノミー',
+        'Extra Fine' => 'エクストラファイン',
+        'Extra fine' => 'エクストラファイン',
         'Fine' => 'ファイン',
         'Normal' => '標準',
         'Standard' => 'スタンダード',
-        'Superfine' => 'S.ファイン',
+        'Super Fine' => 'スーパーファイン',
       },
     },
    'MinoltaTime' => '時間',
@@ -3383,27 +3548,41 @@ $VERSION = '1.07';
         'Sepia' => 'セピア',
       },
     },
+   'MultiExposure' => '多重露出データ',
    'MultiExposureAutoGain' => {
+      Description => '多重露出自動ゲイン',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
    'MultiExposureMode' => {
+      Description => '多重露出モード',
       PrintConv => {
+        'Image Overlay' => 'イメージオーバーレイ',
+        'Multiple Exposure' => '多重露出',
         'Off' => 'オフ',
+      },
+    },
+   'MultiExposureShots' => '多重露出ショット',
+   'MultiExposureVersion' => '多重露出データバージョン',
+   'MultiFrameNoiseReduction' => {
+      Description => 'マルチショットノイズリダクション',
+      PrintConv => {
+        'Off' => '切',
+        'On' => '入',
       },
     },
    'MultiSample' => 'マルチサンプル',
    'MultiSelector' => {
-      Description => '[f2]マルチ選択',
+      Description => 'マルチ選択',
       PrintConv => {
         'Do Nothing' => '何もしない',
         'Reset Meter-off Delay' => 'メーターオフ遅延時間リセット',
       },
     },
    'MultiSelectorPlaybackMode' => {
-      Description => 'マルチ選択 > 再生モード',
+      Description => 'マルチ選択 再生モード',
       PrintConv => {
         'Choose Folder' => 'フォルダー選択',
         'Thumbnail On/Off' => 'サムネイル　オン/オフ',
@@ -3412,7 +3591,7 @@ $VERSION = '1.07';
       },
     },
    'MultiSelectorShootMode' => {
-      Description => 'マルチ選択 > 撮影モード',
+      Description => 'マルチ選択 撮影モード',
       PrintConv => {
         'Highlight Active Focus Point' => 'ハイライトアクティブフォーカスポイント',
         'Not Used' => '未使用',
@@ -3433,6 +3612,7 @@ $VERSION = '1.07';
       },
     },
    'MyColorMode' => {
+      Description => 'マイカラーモード',
       PrintConv => {
         'B&W' => '白黒',
         'Color Accent' => 'カラーアクセント',
@@ -3450,6 +3630,7 @@ $VERSION = '1.07';
         'Vivid Red' => 'ビビッド赤',
       },
     },
+   'MyColors' => 'マイカラーモード',
    'NDFilter' => {
       Description => 'NDフィルター',
       PrintConv => {
@@ -3458,14 +3639,20 @@ $VERSION = '1.07';
       },
     },
    'NEFCompression' => {
+      Description => 'RAW圧縮',
       PrintConv => {
+        'Lossless' => 'ロスレス',
+        'Lossy (type 1)' => '圧縮（タイプ１）',
+        'Lossy (type 2)' => '圧縮（タイプ２）',
         'Uncompressed' => '非圧縮',
       },
     },
+   'NEFLinearizationTable' => '線形化表',
    'NamedColor2' => '色名称2',
    'NativeDisplayInfo' => 'ネイティブディスプレイ情報',
-   'NearLensStep' => 'ニアレンズステップ',
    'NewsPhotoVersion' => '報道写真レコードバージョン',
+   'NikonCaptureData' => 'ニコンキャプチャーデータ',
+   'NikonCaptureOffsets' => 'ニコンキャプチャーオフセット',
    'NikonCaptureVersion' => 'ニコンキャプチャーバージョン',
    'NoMemoryCard' => {
       Description => 'メモリーカード無し',
@@ -3492,13 +3679,12 @@ $VERSION = '1.07';
         'Normal' => '標準',
         'Off' => 'オフ',
         'On' => 'オン',
-        'On 1' => 'オン（モード1）',
-        'On 2' => 'オン（モード2）',
         'Standard' => 'スタンダード',
       },
     },
    'NoiseReduction2' => 'ノイズリダクション2',
    'NoiseReductionApplied' => '適用ノイズリダクション',
+   'NoiseReductionData' => 'ノイズリダクションデータ',
    'NoiseReductionIntensity' => 'ノイズリダクション強度',
    'NoiseReductionMethod' => 'ノイズリダクション方法',
    'NoiseReductionSharpness' => 'ノイズリダクションシャープネス',
@@ -3537,7 +3723,7 @@ $VERSION = '1.07';
    'OpticalZoomMode' => {
       Description => '光学ズームモード',
       PrintConv => {
-        'EX Optics' => 'EX光学',
+        'Extended' => 'EX光学',
         'Standard' => 'スタンダード',
       },
     },
@@ -3575,10 +3761,19 @@ $VERSION = '1.07';
    'PanasonicExifVersion' => 'パナソニックExifバージョン',
    'PanasonicRawVersion' => 'パナソニックRAWバージョン',
    'PanasonicTitle' => 'タイトル',
+   'PanoramaDirection' => 'F値',
    'PanoramaMode' => 'パノラマモード',
    'PentaxImageSize' => 'ペンタックスイメージサイズ',
    'PentaxModelID' => 'ペンタックスモデル',
    'PentaxVersion' => 'ペンタックスバージョン',
+   'People' => '人々',
+   'PhaseDetectAF' => {
+      Description => 'オートフォーカス',
+      PrintConv => {
+        'Off' => 'オフ',
+        'On (51-point)' => 'オン',
+      },
+    },
    'PhotoEffect' => {
       Description => '写真効果',
       PrintConv => {
@@ -3598,6 +3793,7 @@ $VERSION = '1.07';
       },
     },
    'PhotoEffectsBlue' => 'フォトエフェクト青',
+   'PhotoEffectsData' => 'フォトエフェクトデータ',
    'PhotoEffectsGreen' => 'フォトエフェクト緑',
    'PhotoEffectsRed' => 'フォトエフェクト赤',
    'PhotoEffectsType' => {
@@ -3628,6 +3824,7 @@ $VERSION = '1.07';
         'WhiteIsZero' => '白はゼロ',
       },
     },
+   'PhotoshopAnnotations' => 'フォトショップ注釈',
    'PhotoshopFormat' => {
       PrintConv => {
         'Standard' => 'スタンダード',
@@ -3635,6 +3832,7 @@ $VERSION = '1.07';
     },
    'PictInfo' => '写真情報',
    'PictureControl' => {
+      Description => 'ピクチャーコントロール',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -3654,8 +3852,12 @@ $VERSION = '1.07';
         'Quick Adjust' => 'クイック調整',
       },
     },
+   'PictureControlBase' => 'ピクチャーコントロールベース',
+   'PictureControlName' => 'ピクチャーコントロール名',
    'PictureControlQuickAdjust' => 'ピクチャーコントロールクイック調整',
+   'PictureControlVersion' => 'ピクチャーコントロールバージョン',
    'PictureFinish' => {
+      Description => 'ピクチャーフィニッシュ',
       PrintConv => {
         'Monochrome' => 'モノトーン',
         'Natural' => 'ナチュラル',
@@ -3842,6 +4044,7 @@ $VERSION = '1.07';
     },
    'PreCaptureFrames' => 'プレキャプチャーフレーム',
    'Predictor' => '指標',
+   'Preview' => 'プレビューIFDポインター',
    'Preview0' => 'プレビュー0',
    'Preview1' => 'プレビュー1',
    'Preview2' => 'プレビュー2',
@@ -3854,6 +4057,7 @@ $VERSION = '1.07';
       },
     },
    'PreviewDateTime' => 'プレビュー日時',
+   'PreviewIFD' => 'プレビューIFDポインター',
    'PreviewImage' => 'プレビューイメージ',
    'PreviewImageBorders' => 'プレビュー画像境界',
    'PreviewImageData' => 'プレビュー画像データ',
@@ -3878,7 +4082,17 @@ $VERSION = '1.07';
     },
    'PreviewSettingsDigest' => 'プレビュー設定要約',
    'PreviewSettingsName' => 'プレビュー設定名',
-   'PrimaryAFPoint' => 'プライマリAFポイント',
+   'PrimaryAFPoint' => {
+      Description => 'プライマリAFポイント',
+      PrintConv => {
+        'Bottom' => '下',
+        'C6 (Center)' => 'C6 (中央)',
+        'Center' => '中央',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
+        'Top' => '上',
+      },
+    },
    'PrimaryChromaticities' => '原色色度',
    'PrimaryPlatform' => '主要プラットフォーム',
    'PrintIM' => 'プリントイメージマッチング',
@@ -3954,16 +4168,18 @@ $VERSION = '1.07';
       PrintConv => {
         'Best' => 'S.ファイン',
         'Better' => 'ファイン',
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
         'Economy' => 'エコノミー',
+        'Extra Fine' => 'エクストラファイン',
         'Fine' => 'ファイン',
         'Good' => 'エコノミー',
-        'High' => '高い',
-        'Low' => 'ソフト',
+        'Low' => '低画質',
         'Normal' => 'ノーマル',
-        'Normal Movie' => '標準動画',
         'Premium' => 'プレミアム',
+        'RAW + JPEG' => 'RAW+JPEG',
         'Standard' => 'スタンダード',
-        'Superfine' => 'S.ファイン',
+        'n/a' => '未設定',
       },
     },
    'QualityMode' => {
@@ -3975,6 +4191,7 @@ $VERSION = '1.07';
       },
     },
    'QuantizationMethod' => '量子化方法',
+   'QuickAdjust' => 'クイック調整',
    'QuickControlDialInMeter' => {
       Description => '測光タイマー中のサブ電子ダイヤル',
       PrintConv => {
@@ -3991,6 +4208,7 @@ $VERSION = '1.07';
       },
     },
    'RAFVersion' => 'RAFバージョン',
+   'ROCInfo' => 'ROC情報',
    'RasterPadding' => 'ラスタパディング',
    'RasterizedCaption' => 'ラスタ化表題',
    'Rating' => '格付け',
@@ -4038,8 +4256,10 @@ $VERSION = '1.07';
         'High Speed' => '高速',
       },
     },
+   'RawDevExposureBiasValue' => '露出バイアス値',
    'RawDevGrayPoint' => 'グレーポイント',
    'RawDevMemoryColorEmphasis' => '記憶色強調',
+   'RawDevNoiseReduction' => 'ノイズフィルター（増感）',
    'RawDevPMPictureTone' => {
       PrintConv => {
         'Blue' => '青',
@@ -4068,6 +4288,7 @@ $VERSION = '1.07';
    'RawDevSaturationEmphasis' => '彩度強調',
    'RawDevSettings' => 'ノイズリダクション',
    'RawDevSharpnessValue' => 'コントラスト値',
+   'RawDevVersion' => 'RAW展開バージョン',
    'RawDevWBFineAdjustment' => 'ホワイトバランス微調整',
    'RawDevWhiteBalance' => {
       PrintConv => {
@@ -4077,8 +4298,10 @@ $VERSION = '1.07';
    'RawDevWhiteBalanceValue' => 'ホワイトバランス値',
    'RawImageCenter' => 'RAWイメージセンター',
    'RawImageDigest' => 'RAWイメージ要約',
+   'RawImageHeight' => 'イメージ高さ',
    'RawImageSegmentation' => 'RAWイメージ部分番号',
    'RawImageSize' => 'RAWイメージサイズ',
+   'RawImageWidth' => 'イメージ幅',
    'RawInfoVersion' => 'RAW情報バージョン',
    'RawJpgQuality' => {
       Description => 'RAW JPEG　品質',
@@ -4105,12 +4328,6 @@ $VERSION = '1.07';
         'Widescreen' => 'ワイド画面',
       },
     },
-   'RawLinear' => {
-      PrintConv => {
-        'No' => 'いいえ',
-        'Yes' => 'はい',
-      },
-    },
    'RecordMode' => {
       Description => '記録モード',
       PrintConv => {
@@ -4132,7 +4349,9 @@ $VERSION = '1.07';
         'Landscape' => '風景',
         'Manual' => 'マニュアル',
         'Night Scene' => '夜景',
+        'Panorama' => 'パノラマ',
         'Portrait' => 'ポートレート',
+        'Single Shutter' => 'シングルシャッター',
       },
     },
    'RedBalance' => 'レッドバランス',
@@ -4142,6 +4361,7 @@ $VERSION = '1.07';
         'Off' => 'オフ',
       },
     },
+   'RedEyeData' => '赤目データ',
    'RedEyeReduction' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -4179,9 +4399,9 @@ $VERSION = '1.07';
         'Saturation' => '飽和',
       },
     },
-   'RepeatingFlashCount' => 'リピーティングフラッシュ > 時間',
+   'RepeatingFlashCount' => 'リピーティングフラッシュ 時間',
    'RepeatingFlashOutput' => 'リピーティングフラッシュ 出力',
-   'RepeatingFlashRate' => 'リピーティングフラッシュ > 周波数',
+   'RepeatingFlashRate' => 'リピーティングフラッシュ 周波数',
    'ResampleParamsQuality' => {
       PrintConv => {
         'High' => '高い',
@@ -4200,6 +4420,8 @@ $VERSION = '1.07';
       Description => 'XとY解像度単位',
       PrintConv => {
         'None' => '無し',
+        'cm' => 'ピクセル/cm',
+        'inches' => 'インチ',
       },
     },
    'RetouchHistory' => {
@@ -4303,6 +4525,7 @@ $VERSION = '1.07';
       },
     },
    'ScanningDirection' => '走査方向',
+   'Scene' => '場面',
    'SceneArea' => 'シーンエリア？',
    'SceneAssist' => 'シーン調整',
    'SceneCaptureType' => {
@@ -4320,10 +4543,13 @@ $VERSION = '1.07';
       Description => 'シーンモード',
       PrintConv => {
         '2 in 1' => '2イン1',
+        '3D Sweep Panorama' => '3D',
         'Aerial Photo' => '空撮',
+        'Anti Motion Blur' => '人物ブレ軽減',
         'Aperture Priority' => '絞り優先',
         'Auction' => 'アクション',
         'Auto' => 'オート',
+        'Auto+' => 'Auto アドバンス',
         'Available Light' => '自然光',
         'Baby' => '赤ちゃん',
         'Beach' => 'ビーチ',
@@ -4333,12 +4559,14 @@ $VERSION = '1.07';
         'Candlelight' => 'キャンドルライト',
         'Children' => '子供',
         'Color Effects' => 'カラーエフェクト',
+        'Cont. Priority AE' => '連続撮影優先AE',
         'Cuisine' => '料理',
         'Digital Image Stabilization' => 'デジタル手振れ補正',
         'Documents' => '文書',
         'Face Portrait' => '寝顔',
         'Fireworks' => '花火',
         'Food' => '料理',
+        'Handheld Night Shot' => '手持ち夜景',
         'High Key' => 'ハイキー',
         'High Sensitivity' => '高感度',
         'High Speed Continuous Shooting' => '高速連写',
@@ -4389,6 +4617,7 @@ $VERSION = '1.07';
         'Starry Night' => '星空',
         'Sunset' => '夕日',
         'Super Macro' => 'スーパーマクロ',
+        'Sweep Panorama' => 'スイングパノラマ',
         'Text' => 'テキスト',
         'Underwater' => '水中',
         'Underwater Macro' => '水中マクロ',
@@ -4448,7 +4677,9 @@ $VERSION = '1.07';
    'SelectableAFPoint' => {
       Description => '任意選択可能なAFフレーム',
       PrintConv => {
+        '11 points' => '11点',
         '19 points' => '19点',
+        '45 points' => '45点',
         'Inner 9 points' => '9点(内側)',
         'Outer 9 points' => '9点(外側)',
       },
@@ -4499,6 +4730,7 @@ $VERSION = '1.07';
    'SensorTemperature' => 'センサー温度',
    'SensorTopBorder' => 'イメージ上部',
    'SensorWidth' => 'センサー幅',
+   'Sequence' => 'シーケンス',
    'SequenceNumber' => 'シーケンス番号',
    'SequenceShotInterval' => 'シーケンスショットインターバル',
    'SequentialShot' => {
@@ -4578,6 +4810,7 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'ShakeReductionInfo' => 'SR効果',
    'Sharpness' => {
       Description => 'シャープネス',
       PrintConv => {
@@ -4677,7 +4910,6 @@ $VERSION = '1.07';
       },
     },
    'ShortDocumentID' => '短文書ID',
-   'ShortFocal' => '最短焦点',
    'ShortOwnerName' => '短いオーナー名',
    'ShortReleaseTimeLag' => {
       Description => 'レリーズタイムラグ最速化',
@@ -4703,8 +4935,8 @@ $VERSION = '1.07';
       PrintConv => {
         'AE lock/Metering + AF start' => 'AEロック/測光・AF開始',
         'Metering + AF start' => '測光・AF開始',
-        'Metering + AF start / disable' => '測光・AF開始/無効',
         'Metering + AF start/AF stop' => '測光・AF開始/AFストップ',
+        'Metering + AF start/disable' => '測光・AF開始/無効',
         'Metering start/Meter + AF start' => '測光開始/測光・AF開始',
       },
     },
@@ -4780,6 +5012,7 @@ $VERSION = '1.07';
       },
     },
    'SpecialInstructions' => '手順',
+   'SpecialMode' => 'スペシャルモード',
    'SpectralSensitivity' => 'スペクトル感度',
    'SpotFocusPointX' => 'スポットフォーカスポイントX',
    'SpotFocusPointY' => 'スポットフォーカスポイントY',
@@ -4796,6 +5029,7 @@ $VERSION = '1.07';
         'Center' => '中央',
       },
     },
+   'State' => '都道府県名',
    'StoNits' => 'Stoニット',
    'StraightenAngle' => 'ストレートアングル',
    'StreamType' => {
@@ -4819,6 +5053,8 @@ $VERSION = '1.07';
         'Monochrome' => 'モノトーン',
       },
     },
+   'Subject' => 'サブジェクト',
+   'SubjectArea' => '対象領域',
    'SubjectDistance' => '対象距離',
    'SubjectDistanceRange' => {
       Description => '被写体距離範囲',
@@ -4874,6 +5110,7 @@ $VERSION = '1.07';
     },
    'T4Options' => 'T4オプション',
    'T6Options' => 'T6オプション',
+   'TIFF-EPStandardID' => 'TIFF/EP標準ID',
    'TTL_DA_ADown' => 'TTL D/A Aチャンネル　ダウン',
    'TTL_DA_AUp' => 'TTL D/A Aチャンネル アップ',
    'TTL_DA_BDown' => 'TTL D/A Bチャンネル　ダウン',
@@ -4920,6 +5157,7 @@ $VERSION = '1.07';
       },
     },
    'Text' => 'テキスト',
+   'TextInfo' => 'テキスト情報',
    'TextStamp' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -4928,6 +5166,7 @@ $VERSION = '1.07';
     },
    'Thresholding' => '閾値化',
    'ThumbnailImage' => 'サムネイル画像',
+   'ThumbnailImageSize' => 'サムネイルサイズ',
    'ThumbnailImageValidArea' => 'サムネイル画像有効領域',
    'TileByteCounts' => 'タイルのバイト数',
    'TileDepth' => 'タイルの深さ',
@@ -4946,6 +5185,7 @@ $VERSION = '1.07';
    'TimeSincePowerOn' => '電源オン経過時間',
    'TimeStamp' => 'タイムスタンプ',
    'TimeStamp1' => 'タイムスタンプ1',
+   'TimeZone' => 'タイムゾーン',
    'TimeZoneOffset' => 'タイムゾーンオフセット',
    'TimerFunctionButton' => {
       Description => 'ファンクションボタン',
@@ -4964,6 +5204,8 @@ $VERSION = '1.07';
         'Enable' => 'する',
       },
     },
+   'Timezone' => 'タイムゾーン',
+   'Title' => 'タイトル',
    'ToneComp' => 'トーン補正',
    'ToneCurve' => {
       Description => 'トーンカーブ',
@@ -4990,10 +5232,14 @@ $VERSION = '1.07';
       PrintConv => {
         'B&W' => '白黒',
         'Blue' => '青',
+        'Blue-green' => '青緑',
+        'Cyanotype' => '青写真',
         'Green' => '緑',
         'None' => '無し',
         'Purple' => '紫',
+        'Purple-blue' => '青紫',
         'Red' => '赤',
+        'Red-purple' => '赤紫',
         'Sepia' => 'セピア',
         'Yellow' => '黄色',
         'n/a' => '該当無し',
@@ -5021,6 +5267,7 @@ $VERSION = '1.07';
         'Rotate 90 CW' => '90度回転 CW',
       },
     },
+   'TransmissionReference' => '送信元記録',
    'TransparencyIndicator' => '透明度指標',
    'TrapIndicator' => 'トラップインジケーター',
    'Trapped' => {
@@ -5030,6 +5277,7 @@ $VERSION = '1.07';
     },
    'TravelDay' => 'トラベル日付',
    'TvExposureTimeSetting' => 'Tv露出時間設定',
+   'Type' => 'タイプ',
    'USMLensElectronicMF' => {
       Description => 'USMレンズの電子式手動フォーカス',
       PrintConv => {
@@ -5048,7 +5296,9 @@ $VERSION = '1.07';
    'UniqueCameraModel' => 'ユニークカメラモデル',
    'UniqueDocumentID' => 'ユニーク文書ID',
    'UniqueObjectName' => 'ユニーク・ネーム・オブ・オブジェクト',
+   'Unknown' => '不明',
    'Unsharp1Color' => {
+      Description => 'アンシャープ1カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -5062,6 +5312,7 @@ $VERSION = '1.07';
    'Unsharp1Intensity' => 'アンシャープ1強度',
    'Unsharp1Threshold' => 'アンシャープ1起点',
    'Unsharp2Color' => {
+      Description => 'アンシャープ2カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -5075,6 +5326,7 @@ $VERSION = '1.07';
    'Unsharp2Intensity' => 'アンシャープ2強度',
    'Unsharp2Threshold' => 'アンシャープ2起点',
    'Unsharp3Color' => {
+      Description => 'アンシャープ3カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -5088,6 +5340,7 @@ $VERSION = '1.07';
    'Unsharp3Intensity' => 'アンシャープ3強度',
    'Unsharp3Threshold' => 'アンシャープ3起点',
    'Unsharp4Color' => {
+      Description => 'アンシャープ4カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -5101,6 +5354,7 @@ $VERSION = '1.07';
    'Unsharp4Intensity' => 'アンシャープ4強度',
    'Unsharp4Threshold' => 'アンシャープ4起点',
    'UnsharpCount' => 'アンシャープカウント',
+   'UnsharpData' => 'アンシャープデータ',
    'UnsharpMask' => {
       Description => 'アンシャープマスク',
       PrintConv => {
@@ -5158,6 +5412,8 @@ $VERSION = '1.07';
       },
     },
    'VRDVersion' => 'VRDバージョン',
+   'VRInfo' => 'VR（手振れ補正）情報',
+   'VRInfoVersion' => 'VR情報バージョン',
    'VR_0x66' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -5199,6 +5455,7 @@ $VERSION = '1.07';
    'ViewingCondIlluminant' => '視聴状態光源',
    'ViewingCondIlluminantType' => '視聴状態光源タイプ',
    'ViewingCondSurround' => '視聴状態周辺',
+   'ViewingConditions' => '視聴状態光源',
    'VignetteControl' => {
       Description => 'ビネットコントロール',
       PrintConv => {
@@ -5217,6 +5474,7 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'WBAdjData' => 'ホワイトバランス調整データ',
    'WBAdjLighting' => {
       Description => 'ホワイトバランス調整、ライティング',
       PrintConv => {
@@ -5238,8 +5496,6 @@ $VERSION = '1.07';
       },
     },
    'WBAdjTemperature' => 'ホワイトバランス調整、色温度',
-   'WBAdjustAB' => 'ホワイトバランス調整A/B',
-   'WBAdjustGM' => 'ホワイトバランス調整G/M',
    'WBBlueLevel' => 'ホワイトバランス青レベル',
    'WBBracketMode' => {
       Description => 'ホワイトバランスブラケットモード',
@@ -5274,7 +5530,6 @@ $VERSION = '1.07';
    'WBRedLevel' => 'ホワイトバランス赤レベル',
    'WBShiftAB' => 'WB AB補正',
    'WBShiftGM' => 'WB GM補正',
-   'WBShiftMG' => 'WB GM補正',
    'WB_GBRGLevels' => 'WB GBRG レベル',
    'WB_GRBGLevels' => 'WB GRBG レベル',
    'WB_GRGBLevels' => 'WB GRGB レベル',
@@ -5328,6 +5583,8 @@ $VERSION = '1.07';
         'Auto' => 'オート',
         'Black & White' => '白黒',
         'Cloudy' => '曇り',
+        'Color Temperature/Color Filter' => '色温度マニュアル指定',
+        'Cool White Fluorescent' => '白色蛍光灯',
         'Custom' => 'カスタム',
         'Custom 1' => 'カスタム1',
         'Custom 2' => 'カスタム2',
@@ -5340,8 +5597,6 @@ $VERSION = '1.07';
         'Day White Fluorescent' => '昼白色蛍光灯',
         'Daylight' => '昼光',
         'Daylight Fluorescent' => '昼光色蛍光灯',
-        'DaylightFluorescent' => '昼光色蛍光灯',
-        'DaywhiteFluorescent' => '昼白色蛍光灯',
         'Flash' => 'ストロボ',
         'Fluorescent' => '蛍光灯',
         'Incandescent' => '電球',
@@ -5355,14 +5610,12 @@ $VERSION = '1.07';
         'PC Set4' => 'PC設定4',
         'PC Set5' => 'PC設定5',
         'Shade' => '日陰',
-        'Shadow' => '日陰',
         'Tungsten' => 'タングステン(白熱灯)',
         'Underwater' => '水中',
         'Unknown' => '不明',
         'User-Selected' => 'ユーザ選択',
         'Warm White Fluorescent' => '暖白光色蛍光灯',
         'White Fluorescent' => '温白色蛍光灯',
-        'WhiteFluorescent' => '温白色蛍光灯',
       },
     },
    'WhiteBalance2' => {
@@ -5408,13 +5661,13 @@ $VERSION = '1.07';
       Description => 'ホワイトバランスモード',
       PrintConv => {
         'Auto (Cloudy)' => 'オート（曇天）',
+        'Auto (Day White Fluorescent)' => 'オート（昼白色蛍光灯）',
+        'Auto (Daylight Fluorescent)' => 'オート（昼光色蛍光灯）',
         'Auto (Daylight)' => 'オート（昼光）',
-        'Auto (DaylightFluorescent)' => 'オート（昼光色蛍光灯）',
-        'Auto (DaywhiteFluorescent)' => 'オート（昼白色蛍光灯）',
         'Auto (Flash)' => 'オート（ストロボ）',
         'Auto (Shade)' => 'オート（日陰）',
         'Auto (Tungsten)' => 'オート（白熱灯）',
-        'Auto (WhiteFluorescent)' => 'オート（白色蛍光灯）',
+        'Auto (White Fluorescent)' => 'オート（白色蛍光灯）',
         'Unknown' => '不明',
         'User-Selected' => 'ユーザー選択',
       },
@@ -5424,9 +5677,9 @@ $VERSION = '1.07';
       PrintConv => {
         'Auto' => 'オート',
         'Cloudy' => '曇り',
+        'Day White Fluorescent' => '昼白色蛍光灯',
         'Daylight' => '昼光',
-        'DaylightFluorescent' => '昼光色蛍光灯',
-        'DaywhiteFluorescent' => '昼白色蛍光灯',
+        'Daylight Fluorescent' => '昼光色蛍光灯',
         'Flash' => 'ストロボ',
         'Manual' => 'マニュアル',
         'Set Color Temperature 1' => '色温度設定1',
@@ -5434,13 +5687,14 @@ $VERSION = '1.07';
         'Set Color Temperature 3' => '色温度設定3',
         'Shade' => '日陰',
         'Tungsten' => 'タングステン(白熱灯)',
-        'WhiteFluorescent' => '温白色蛍光灯',
+        'White Fluorescent' => '温白色蛍光灯',
       },
     },
    'WhiteBalanceTemperature' => 'ホワイトバランス温度',
    'WhiteBoard' => 'ホワイトボード',
    'WhiteLevel' => '白レベル',
    'WhitePoint' => '白点色度',
+   'Wide' => 'ワイド',
    'WideFocusZone' => 'ワイドフォーカスゾーン',
    'WideRange' => {
       Description => 'ワイドレンジ',
@@ -5450,6 +5704,7 @@ $VERSION = '1.07';
       },
     },
    'WidthResolution' => '幅方向の画像解像度',
+   'WorldTime' => 'タイムゾーン',
    'WorldTimeLocation' => {
       Description => 'ワールドタイム位置',
       PrintConv => {
@@ -5461,6 +5716,7 @@ $VERSION = '1.07';
    'Writer-Editor' => '表題/説明の作家',
    'X3FillLight' => 'X3光を満たす',
    'XClipPathUnits' => 'Xクリップパス単位',
+   'XMP' => 'XMPメタデータ',
    'XPAuthor' => '作者',
    'XPComment' => 'コメント',
    'XPKeywords' => 'キーワード',
@@ -5495,6 +5751,7 @@ $VERSION = '1.07';
         'On' => 'オン',
       },
     },
+   'Zoom' => 'ズーム',
    'ZoomSourceWidth' => 'ズームソース幅',
    'ZoomStepCount' => 'ズームステップ数',
    'ZoomTargetWidth' => 'ズームターゲット幅',
@@ -5516,7 +5773,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

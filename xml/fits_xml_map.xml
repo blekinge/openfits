@@ -8,7 +8,7 @@
 		</mime>
 	</tool>
 
-	<tool name="exiftool" version="7.74">
+	<tool name="exiftool" version="9.05">
 		<mime type="all">
 			<element name="samplingFrequencyUnit">
 				<map from="None" to="no absolute unit of measurement"/>

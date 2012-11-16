@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.11';
+$VERSION = '1.19';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -48,7 +48,7 @@ sub WriteAdobeStuff($$$);
 );
 
 %Image::ExifTool::DNG::AdobeData = ( #PH
-    GROUPS => { 0 => 'MakerNotes', 1 => 'Adobe', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 1 => 'AdobeDNG', 2 => 'Image' },
     PROCESS_PROC => \&ProcessAdobeData,
     WRITE_PROC => \&WriteAdobeStuff,
     NOTES => q{
@@ -56,11 +56,11 @@ sub WriteAdobeStuff($$$);
 
         The maker notes ('MakN') are processed by ExifTool, but some information may
         have been lost by the Adobe DNG Converter.  This is because the Adobe DNG
-        Converter (as of version 4.3) doesn't properly handle information referenced
+        Converter (as of version 6.3) doesn't properly handle information referenced
         from inside the maker notes that lies outside the original maker notes
-        block, and this information is lost when only the maker note block is copied
-        to the DNG image.   While this isn't a big problem for most camera makes, it
-        is serious for some makes like Olympus.
+        block.  This information is lost when only the maker note block is copied to
+        the DNG image.   While this doesn't effect all makes of cameras, it is a
+        problem for some major brands such as Olympus and Sony.
 
         Other entries in this table represent proprietary information that is
         extracted from the original RAW image and restructured to a different (but
@@ -168,8 +168,9 @@ sub ProcessOriginalRaw($$$)
             $pos + $hdrLen > $end and $err = '', last;
             my $tag = $$tagInfo{Name};
             # only extract this information if requested (because it takes time)
-            if ($exifTool->{OPTIONS}->{Binary} or
-                $exifTool->{REQ_TAG_LOOKUP}->{lc($tag)})
+            my $lcTag = lc $tag;
+            if (($exifTool->{OPTIONS}{Binary} and not $exifTool->{EXCL_TAG_LOOKUP}{$lcTag}) or
+                $exifTool->{REQ_TAG_LOOKUP}{$lcTag})
             {
                 unless (eval 'require Compress::Zlib') {
                     $err = 'Install Compress::Zlib to extract compressed images';
@@ -231,8 +232,11 @@ sub ProcessAdobeData($$$)
     return 0 unless $$dataPt =~ /^Adobe\0/;
     unless ($outfile) {
         $exifTool->VerboseDir($dirInfo);
+        # don't parse makernotes if FastScan > 1
+        my $fast = $exifTool->Options('FastScan');
+        return 1 if $fast and $fast > 1;
     }
-    $htmlDump and $exifTool->HtmlDump($dataPos, 6, 'Adobe DNGPrivateData header');
+    $htmlDump and $exifTool->HDump($dataPos, 6, 'Adobe DNGPrivateData header');
     SetByteOrder('MM'); # always big endian
     $pos += 6;
     while ($pos + 8 <= $end) {
@@ -243,10 +247,10 @@ sub ProcessAdobeData($$$)
         if ($htmlDump) {
             my $name = "Adobe$tag";
             $name =~ tr/ //d;
-            $exifTool->HtmlDump($dataPos + $pos - 8, 8, "$name header", "Data Size: $size bytes");
+            $exifTool->HDump($dataPos + $pos - 8, 8, "$name header", "Data Size: $size bytes");
             # dump non-EXIF format data
             unless ($tag =~ /^(MakN|SR2 )$/) {
-                $exifTool->HtmlDump($dataPos + $pos, $size, "$name data");
+                $exifTool->HDump($dataPos + $pos, $size, "$name data");
             }
         }
         if ($verbose and not $outfile) {
@@ -415,8 +419,8 @@ sub ProcessAdobeCRW($$$)
                     }
                 } elsif ($$newTags{$tagID}) {
                     my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                    if (Image::ExifTool::IsOverwriting($nvHash, $val)) {
-                        my $newVal = Image::ExifTool::GetNewValues($nvHash);
+                    if ($exifTool->IsOverwriting($nvHash, $val)) {
+                        my $newVal = $exifTool->GetNewValues($nvHash);
                         my $verboseVal;
                         $verboseVal = $newVal if $verbose > 1;
                         # convert to specified format if necessary
@@ -586,7 +590,7 @@ sub ProcessAdobeSR2($$$)
         Parent    => $$dirInfo{DirName},
     );
     if ($exifTool->Options('HtmlDump')) {
-        $exifTool->HtmlDump($dataPos + $start, 6, 'Adobe SR2 data');
+        $exifTool->HDump($dataPos + $start, 6, 'Adobe SR2 data');
     }
     # parse the SR2 directory
     $exifTool->ProcessDirectory(\%subdirInfo, $tagTablePtr);
@@ -605,7 +609,6 @@ sub ProcessAdobeIFD($$$)
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart};
     my $dataPos = $$dirInfo{DataPos};
-    my $base = $$dirInfo{Base};
 
     return 0 if $$dirInfo{DirLen} < 4;
     my $dataOrder = substr($$dataPt, $pos, 2);
@@ -704,8 +707,8 @@ sub ProcessAdobeMakN($$$)
         return 0;
     }
     if ($exifTool->Options('HtmlDump')) {
-        $exifTool->HtmlDump($dataPos + $start, 6, 'Adobe MakN data');
-        $exifTool->HtmlDump($dataPos + $dirStart, $loc, "$$tagInfo{Name} header") if $loc;
+        $exifTool->HDump($dataPos + $start, 6, 'Adobe MakN data');
+        $exifTool->HDump($dataPos + $dirStart, $loc, "$$tagInfo{Name} header") if $loc;
     }
 
     my $fix = 0;
@@ -739,6 +742,8 @@ sub ProcessAdobeMakN($$$)
             # shift offsets to position of original maker notes
             $fixup->{Shift} += $originalPos;
         }
+        # if we wrote the directory as a block the header is already included
+        $loc = 0 if $subdirInfo{BlockWrite};
         $fixup->{Shift} += $loc;    # adjust for makernotes header
         $fixup->ApplyFixup(\$buff); # fix up pointer offsets
         # get copy of original Adobe header (6) and makernotes header ($loc)
@@ -750,7 +755,7 @@ sub ProcessAdobeMakN($$$)
         $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $$subdir{ProcessProc});
         # extract maker notes as a block if specified
         if ($exifTool->Options('MakerNotes') or
-            $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})})
+            $exifTool->{REQ_TAG_LOOKUP}{lc($$tagInfo{Name})})
         {
             my $val;
             if ($$tagInfo{MakerNotes}) {
@@ -760,7 +765,9 @@ sub ProcessAdobeMakN($$$)
                 $subdirInfo{DirLen}   = $dirLen;
                 # rebuild the maker notes to identify all offsets that require fixing up
                 $val = Image::ExifTool::Exif::RebuildMakerNotes($exifTool, $subTable, \%subdirInfo);
-                defined $val or $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                if (not defined $val and $dirLen > 4) {
+                    $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                }
             } else {
                 # extract this directory as a block if specified
                 return 1 unless $$tagInfo{Writable};
@@ -806,7 +813,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
