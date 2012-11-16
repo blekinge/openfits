@@ -4,6 +4,9 @@
 FITS_HOME=`echo "$0" | sed 's,/[^/]*$,,'`
 export FITS_HOME
 
+# Uncomment the following line if you want "file utility" to dereference and follow symlinks.
+# export POSIXLY_CORRECT=1
+
 # concatenate args and use eval/exec to preserve spaces in paths, options and args
 args=""
 for arg in "$@" ; do
