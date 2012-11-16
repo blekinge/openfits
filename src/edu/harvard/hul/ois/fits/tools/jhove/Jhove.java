@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -51,6 +54,8 @@ public class Jhove extends ToolBase {
     private String jhoveConf;
     private boolean enabled = true;
     
+    public final static Calendar calendar = GregorianCalendar.getInstance();
+    
     public final static String jhoveFitsConfig = Fits.FITS_XML+"jhove"+File.separator;
 	
 	public Jhove() throws FitsException {
@@ -66,8 +71,22 @@ public class Jhove extends ToolBase {
 	    	jhove.setSignatureFlag(false);
 	    	jhove.setShowRawFlag(false);
 	        xh = new XmlHandler();
-	        jhoveApp = new App ("Jhove","1.5", new int[] {2009, 12, 23}, "","");
-			xh.setApp(jhoveApp);
+	        // GDM 16-Nov-2012: Use actual information from JHOVE instead of
+	        // hard-coding. 
+	        //jhoveApp = new App ("Jhove","1.5", new int[] {2009, 12, 23}, "","");
+	        calendar.setTime(jhove.getDate());
+	        
+	        int[] dtArray = new int[] {
+	            calendar.get(Calendar.YEAR),
+	            calendar.get(Calendar.MONTH) + 1,
+	            calendar.get(Calendar.DAY_OF_MONTH)
+	        };
+	        jhoveApp = new App ("Jhove",
+	                jhove.getRelease(), 
+                    dtArray, 
+                    "",
+                    "");
+            xh.setApp(jhoveApp);
 			xh.setBase(jhove);				
 		}
 		catch (JhoveException e) {
