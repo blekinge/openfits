@@ -12,6 +12,13 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		
 		<metadata>
 			<video>
+				<digitalCameraManufacturer>
+				    <xsl:value-of select="exiftool/Make"/>
+				</digitalCameraManufacturer>
+				<digitalCameraModelName>
+				    <xsl:value-of select="exiftool/Model"/>
+				</digitalCameraModelName>
+
 				<duration>
 					<xsl:value-of select="exiftool/Duration"/>
 				</duration>
@@ -192,6 +199,186 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						</creatingApplicationName>
 					</xsl:when>
 				</xsl:choose>		
+
+				<xsl:choose>
+					<xsl:when test="exiftool/VideoStreamType">
+						<videoStreamType>
+							<xsl:value-of select="exiftool/VideoStreamType"/>
+						</videoStreamType>
+					</xsl:when>
+				</xsl:choose>
+
+				<shutterSpeedValue>
+					<xsl:value-of select="exiftool/ShutterSpeed"/>
+				</shutterSpeedValue>
+
+				<apertureSetting>
+					<xsl:value-of select="exiftool/ApertureSetting"/>
+				</apertureSetting>
+
+				<fNumber>
+					<xsl:value-of select="exiftool/FNumber"/>
+				</fNumber>
+
+				<gain>
+					<xsl:value-of select="exiftool/Gain"/>
+				</gain>
+
+				<exposureTime>
+					<xsl:value-of select="exiftool/ExposureTime"/>
+				</exposureTime>
+
+				<exposureProgram>
+					<xsl:value-of select="exiftool/ExposureProgram"/>
+				</exposureProgram>
+
+
+
+				<whiteBalance>
+					<xsl:value-of select="exiftool/WhiteBalance"/>
+				</whiteBalance>
+
+				<imageStabilization>
+					<xsl:value-of select="exiftool/ImageStabilization"/>
+				</imageStabilization>
+
+				<focus>
+					<xsl:value-of select="exiftool/Focus"/>
+				</focus>
+
+				<!-- GPS FIELDS -->
+				<gpsVersionID>
+					<xsl:value-of select="exiftool/GPSVersionID"/>
+				</gpsVersionID>
+				<xsl:choose>
+					<xsl:when test="exiftool/GPSLatitudeRef">
+						<gpsLatitudeRef>
+							<xsl:value-of select="exiftool/GPSLatitudeRef"/>
+						</gpsLatitudeRef>
+					</xsl:when>
+					<xsl:when test="exiftool/GPSLatitude">
+						<gpsLatitudeRef>
+							<xsl:value-of select="substring-after(exiftool/GPSLatitude,'&quot; ')"/>
+						</gpsLatitudeRef>
+					</xsl:when>
+				</xsl:choose>
+				<gpsLatitude>
+					<xsl:value-of select="exiftool/GPSLatitude"/>
+				</gpsLatitude>
+
+				<xsl:choose>
+					<xsl:when test="exiftool/GPSLongitudeRef">
+						<gpsLongitudeRef>
+							<xsl:value-of select="exiftool/GPSLongitudeRef"/>
+						</gpsLongitudeRef>
+					</xsl:when>
+					<xsl:when test="exiftool/GPSLongitude">
+						<gpsLongitudeRef>
+							<xsl:value-of select="substring-after(exiftool/GPSLongitude,'&quot; ')"/>
+						</gpsLongitudeRef>
+					</xsl:when>
+				</xsl:choose>
+				<gpsLongitude>
+					<xsl:value-of select="exiftool/GPSLongitude"/>
+				</gpsLongitude>
+
+				<gpsAltitudeRef>
+					<xsl:value-of select="exiftool/GPSAltitudeRef"/>
+				</gpsAltitudeRef>
+				<gpsAltitude>
+					<xsl:value-of select="exiftool/GPSAltitude"/>
+				</gpsAltitude>
+				<gpsTimeStamp>
+					<xsl:value-of select="exiftool/GPSTimeStamp"/>
+				</gpsTimeStamp>
+				<gpsSatellites>
+					<xsl:value-of select="exiftool/GPSSatellites"/>
+				</gpsSatellites>
+				<gpsStatus>
+					<xsl:value-of select="exiftool/GPSStatus"/>
+				</gpsStatus>
+				<gpsMeasureMode>
+					<xsl:value-of select="exiftool/GPSMeasureMode"/>
+				</gpsMeasureMode>
+				<gpsDOP>
+					<xsl:value-of select="exiftool/GPSDOP"/>
+				</gpsDOP>
+				<gpsSpeedRef>
+					<xsl:value-of select="exiftool/GPSSpeedRef"/>
+				</gpsSpeedRef>
+				<gpsSpeed>
+					<xsl:value-of select="exiftool/GPSSpeed"/>
+				</gpsSpeed>
+				<gpsTrackRef>
+					<xsl:value-of select="exiftool/GPSTrackRef"/>
+				</gpsTrackRef>
+				<gpsTrack>
+					<xsl:value-of select="exiftool/GPSTrack"/>
+				</gpsTrack>
+				<gpsImgDirectionRef>
+					<xsl:value-of select="exiftool/GPSImgDirectionRef"/>
+				</gpsImgDirectionRef>
+				<gpsImgDirection>
+					<xsl:value-of select="exiftool/GPSImgDirection"/>
+				</gpsImgDirection>
+				<gpsMapDatum>
+					<xsl:value-of select="exiftool/GPSMapDatum"/>
+				</gpsMapDatum>
+				<xsl:choose>
+					<xsl:when test="exiftool/GPSDestLatitudeRef">
+						<gpsDestLatitudeRef>
+							<xsl:value-of select="exiftool/GPSDestLatitudeRef"/>
+						</gpsDestLatitudeRef>
+					</xsl:when>
+					<xsl:when test="exiftool/GPSDestLatitude">
+						<gpsDestLatitudeRef>
+							<xsl:value-of select="substring-after(exiftool/GPSDestLatitude,'&quot; ')"/>
+						</gpsDestLatitudeRef>
+					</xsl:when>
+				</xsl:choose>
+				<gpsDestLatitude>
+					<xsl:value-of select="exiftool/GPSDestLatitude"/>
+				</gpsDestLatitude>
+
+				<xsl:choose>
+					<xsl:when test="exiftool/GPSDestLongitudeRef">
+						<gpsDestLongitudeRef>
+							<xsl:value-of select="exiftool/GPSDestLongitudeRef"/>
+						</gpsDestLongitudeRef>
+					</xsl:when>
+					<xsl:when test="exiftool/GPSDestLongitude">
+						<gpsDestLongitudeRef>
+							<xsl:value-of select="substring-after(exiftool/GPSDestLongitude,'&quot; ')"/>
+						</gpsDestLongitudeRef>
+					</xsl:when>
+				</xsl:choose>
+				<gpsDestLongitude>
+					<xsl:value-of select="exiftool/GPSDestLongitudeRef"/>
+				</gpsDestLongitude>
+				<gpsDestBearingRef>
+					<xsl:value-of select="exiftool/GPSDestBearingRef"/>
+				</gpsDestBearingRef>
+				<gpsDestBearing>
+					<xsl:value-of select="exiftool/GPSDestBearing"/>
+				</gpsDestBearing>
+				<gpsDestDistanceRef>
+					<xsl:value-of select="exiftool/GPSDestDistanceRef"/>
+				</gpsDestDistanceRef>
+				<gpsDestDistance>
+					<xsl:value-of select="exiftool/GPSDestDistance"/>
+				</gpsDestDistance>
+				<gpsProcessingMethod>
+					<xsl:value-of select="exiftool/GPSProcessingMethod"/>
+				</gpsProcessingMethod>
+				<gpsAreaInformation>
+					<xsl:value-of select="exiftool/GPSAreaInformation"/>
+				</gpsAreaInformation>
+				<gpsDateStamp>
+					<xsl:value-of select="replace(exiftool/GPSDateStamp,':','-')"/>
+				</gpsDateStamp>
+				<gpsDifferential>
+					<xsl:value-of select="exiftool/GPSDifferential"/>
+				</gpsDifferential>
 			</video>			
 		</metadata>
 	</fits>	
