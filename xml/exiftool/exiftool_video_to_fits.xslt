@@ -232,8 +232,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<xsl:value-of select="exiftool/ExposureProgram"/>
 				</exposureProgram>
 
-
-
 				<whiteBalance>
 					<xsl:value-of select="exiftool/WhiteBalance"/>
 				</whiteBalance>
