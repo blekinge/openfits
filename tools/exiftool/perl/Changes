@@ -7,6 +7,15 @@ RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 Note: The most recent production release is Version 9.04. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
 
+Nov. 17, 2012 - Version 9.06
+
+  - Added support for Nikon maker notes in images from any camera make (as
+    written by Capture NX2)
+  - Added support for FujiFilm X-E1 RAF images
+  - Added a new Olympus CameraType
+  - Added a new PentaxModelID and a new Pentax LensType
+  - Fixed bug decoding UTF-16 ID3 synchronized lyrics
+
 Nov. 10, 2012 - Version 9.05
 
   - Added ability to read APE metadata from MP3 audio files

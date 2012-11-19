@@ -320,6 +320,7 @@ my %olympusCameraTypes = (
     S0039 => 'E-PM1',
     S0040 => 'E-PL1s',
     S0042 => 'E-PL5',
+    S0043 => 'E-PM2',
     SR45 => 'D220',
     SR55 => 'D320L',
     SR83 => 'D340L',

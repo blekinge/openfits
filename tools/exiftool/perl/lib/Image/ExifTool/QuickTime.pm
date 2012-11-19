@@ -265,6 +265,7 @@ my %graphicsMode = (
     ],
     skip => [
         {
+            Name => 'CanonSkip',
             Condition => '$$valPt =~ /^\0.{3}(CNDB|CNCV|CNMN|CNFV|CNTH|CNDM)/s',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::Skip' },
         },
@@ -797,7 +798,7 @@ my %graphicsMode = (
         },
     },
     DcMD => {
-        Name => 'DcMD',
+        Name => 'KodakDcMD',
         SubDirectory => { TagTable => 'Image::ExifTool::Kodak::DcMD' },
     },
     # AMBA => Ambarella AVC atom (unknown data written by Kodak Playsport video cam)
@@ -999,7 +1000,7 @@ my %graphicsMode = (
         },
     },
     Xtra => { #PH (microsoft)
-        Name => 'Xtra',
+        Name => 'MicrosoftXtra',
         SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::Xtra' },
     },
     hinv => 'HintVersion', #PH (guess)

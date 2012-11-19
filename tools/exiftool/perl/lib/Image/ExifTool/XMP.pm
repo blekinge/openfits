@@ -3228,7 +3228,7 @@ sub ParseXMPElement($$$;$$$$)
                     } elsif ($lastProp eq 'rdf:type' and $wasEmpty) {
                         # do not extract empty structure types (for now)
                     } elsif ($lastProp =~ /^et:(desc|prt|val)$/ and ($count or $1 eq 'desc')) {
-                        # ignore et:desc, and et:val if preceeded by et:prt
+                        # ignore et:desc, and et:val if preceded by et:prt
                         --$count;
                     } else {
                         &$foundProc($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);

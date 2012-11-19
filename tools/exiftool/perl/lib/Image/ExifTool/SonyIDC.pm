@@ -312,7 +312,7 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to read and
-write Sony Image Data Converter verson 3.0 metadata in ARW images.
+write Sony Image Data Converter version 3.0 metadata in ARW images.
 
 =head1 AUTHOR
 

@@ -3489,7 +3489,7 @@ my %faceInfo = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
         Data for tags 0x2010 and 0x94xx is encrypted by a simple substitution
-        cipher, but is decrypted by ExifTool.
+        cipher, but the deciphered values are listed below.
     },
     # 0x0000-0x0007:   7 1 1 1 0 0 0 0 (e) for DSC-HX9V
     #                 10 1 1 1 0 0 0 0 (e) for SLT or NEX (also RX100)
@@ -4177,7 +4177,7 @@ my @lensFeatures = (
     #  Mask   {  Bits     Name    Bits     Name  } Prefix flag
     # ------    ------    -----  ------    -----   -----------
     [ 0x4000, { 0x4000 => 'PZ'                   }, 1 ],
-    [ 0x0300, { 0x0100 => 'DT',  0x0300 => 'E'   }, 1 ], # (will come before preceeding prefix)
+    [ 0x0300, { 0x0100 => 'DT',  0x0300 => 'E'   }, 1 ], # (will come before preceding prefix)
     [ 0x000c, { 0x0004 => 'ZA',  0x0008 => 'G'   } ],
     [ 0x00e0, { 0x0020 => 'STF', 0x0040 => 'Reflex', 0x0060 => 'Macro', 0x0080 => 'Fisheye' } ],
     [ 0x0003, { 0x0001 => 'SSM', 0x0002 => 'SAM' } ],

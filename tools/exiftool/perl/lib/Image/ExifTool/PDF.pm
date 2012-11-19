@@ -912,7 +912,7 @@ sub ReadToNested($;$)
         }
         # are we in a literal string?
         if ($delim[0] eq ')') {
-            # ignore escaped delimiters (preceeded by odd number of \'s)
+            # ignore escaped delimiters (preceded by odd number of \'s)
             next if length($1) & 0x01;
             # ignore all delimiters but unescaped braces
             next unless $2 eq '(' or $2 eq ')';

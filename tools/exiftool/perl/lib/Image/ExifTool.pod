@@ -552,7 +552,7 @@ undef.
 Exclude specified tags from tags extracted from an image.  The option value
 is either a tag name or reference to a list of tag names to exclude.  The
 case of tag names is not significant.  This option is ignored for
-specifically requested tags.  Tags may also be excluded by preceeding their
+specifically requested tags.  Tags may also be excluded by preceding their
 name with a '-' in the arguments to L</ImageInfo>.
 
 =item ExtractEmbedded

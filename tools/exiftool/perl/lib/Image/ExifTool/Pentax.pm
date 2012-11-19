@@ -52,7 +52,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.49';
+$VERSION = '2.50';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -300,6 +300,7 @@ sub PrintFilter($$$);
     '21 3' => '03 Fish-eye 3.2mm F5.6', #PH (NC)
     '21 4' => '04 Toy Lens Wide 6.3mm F7.1', #PH (NC)
     '21 5' => '05 Toy Lens Telephoto 18mm F8', #PH (NC)
+    '21 6' => '06 Telephoto Zoom 15-45mm F2.8', #PH
 );
 
 # Pentax model ID codes - PH
@@ -415,6 +416,7 @@ my %pentaxModelID = (
     0x12f48 => 'Optio LS465',
     0x12f52 => 'K-30',
     0x12f5c => 'X-5',
+    0x12f66 => 'Q10',
     0x12f70 => 'K-5 II',
     0x12f71 => 'K-5 II s', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4515.0.html
 );
@@ -753,6 +755,7 @@ my %binaryDataAttrs = (
             30 => '4288x3216', #PH (Optio RS1000)
             31 => '4608x3456', #PH (Optio RZ18)
             129 => '1920x1080', #PH (Optio RZ10)
+            135 => '4608x2592', #PH (Q10 stretch filter)
             257 => '3216x3216', #PH (Optio RZ10)
             '0 0' => '2304x1728', #13
             '4 0' => '1600x1200', #PH (Optio MX4)
@@ -764,6 +767,7 @@ my %binaryDataAttrs = (
             '35 1' => '2400x1600', #7
             '36 0' => '3008x2008 or 3040x2024',  #PH
             '37 0' => '3008x2000', #13
+            # 65535 - seen for an X-5 panorama (PH)
         },
     },
     0x000b => { #3
@@ -827,6 +831,7 @@ my %binaryDataAttrs = (
             59 => 'Report', #25
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
+            63 => 'Panorama 2', #PH (X-5)
             65 => 'Half-length Portrait', #JD
             66 => 'Portrait 2', #PH (LS645)
             75 => 'Blue Sky', #PH (LS465)
@@ -1045,7 +1050,7 @@ my %binaryDataAttrs = (
             276 => 25600, #PH
             277 => 36000, #PH
             278 => 51200, #PH
-            # 65534 Auto? (Q MOV) PH
+            # 65534 Auto? (Q/Q10 MOV) PH
             # 65535 Auto? (K-01 MP4) PH
         },
     },
@@ -1669,7 +1674,7 @@ my %binaryDataAttrs = (
         PrintConv => {
             '0 0 0 0' => 'Off',
             '1 0 0 0' => 'On',
-            # '0 2 0 0' - seen for Pentax Q and K-01
+            # '0 2 0 0' - seen for Pentax Q, Q10 and K-01
         },
     },
     0x006b => { #PH (K-5)
@@ -1847,7 +1852,7 @@ my %binaryDataAttrs = (
             '1 1' => 'Weak',
             '1 2' => 'Normal',
             '1 3' => 'Strong',
-            # '2 4' - seen for Pentax Q and K-01
+            # '2 4' - seen for Pentax Q, Q10 and K-01
         },
     },
     0x007a => { #PH
@@ -2937,6 +2942,7 @@ my %binaryDataAttrs = (
             75 => 'Night Scene Portrait',
             83 => 'No Flash',
             91 => 'Night Scene',
+            # 96 - seen for Pentax Q10
             99 => 'Surf & Snow',
             104 => 'Night Snap', # (Q)
             107 => 'Text',

@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.35';
+$VERSION = '1.36';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -790,9 +790,17 @@ sub ProcessSynText($$$)
     $lang = lc $lang;
     undef $lang if $lang !~ /^[a-z]{3}$/ or $lang eq 'eng';
     pos($$dataPt) = 6;
-    my $term = ($enc == 1 or $enc == 2) ? "\0\0" : "\0";
-    $$dataPt =~ /$term/g or return;
-    my $desc = substr($$dataPt, 6, pos($$dataPt) - 6 - length($term));
+    my ($termLen, $pat);
+    if ($enc == 1 or $enc == 2) {
+        $$dataPt =~ /\G(..)*?\0\0/sg or return;
+        $termLen = 2;
+        $pat = '\G(?:..)*?\0\0(....)';
+    } else {
+        $$dataPt =~ /\0/g or return;
+        $termLen = 1;
+        $pat = '\0(....)';
+    }
+    my $desc = substr($$dataPt, 6, pos($$dataPt) - 6 - $termLen);
     $desc = DecodeString($exifTool, $desc, $enc);
 
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 'desc');
@@ -804,9 +812,9 @@ sub ProcessSynText($$$)
 
     for (;;) {
         my $pos = pos $$dataPt;
-        last unless $$dataPt =~ /$term(....)/sg;
+        last unless $$dataPt =~ /$pat/sg;
         my $time = unpack('N', $1);
-        my $text = substr($$dataPt, $pos, pos($$dataPt) - $pos - 4 - length($term));
+        my $text = substr($$dataPt, $pos, pos($$dataPt) - $pos - 4 - $termLen);
         $text = DecodeString($exifTool, $text, $enc);
         my $timeStr;
         if ($timeCode == 2) { # time in ms

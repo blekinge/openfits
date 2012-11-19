@@ -148,7 +148,7 @@ sub SaveMakerNotes($)
     $makerNotes .= $makerInfo->{ValBuff};
     # get MakerNotes tag info
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Exif::Main');
-    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 0x927c);
+    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 0x927c, \$makerNotes);
     # save the MakerNotes
     $exifTool->FoundTag($tagInfo, $makerNotes);
     # save the garbage collection some work later
