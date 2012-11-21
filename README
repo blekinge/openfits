@@ -4,6 +4,10 @@ at optimizing it. The official version of FITS is found at
 (https://code.google.com/p/fits/). This fork is taken from version
 0.61 on Google Code.
 
+NOTE: This repository (under the "gmcgath" account) will be going away 
+in early December. If you want to fork it or grab anything from it, 
+be sure to do it soon.
+
 Quoting from that site:
 
 "The File Information Tool Set (FITS) identifies, validates, and extracts 
